@@ -123,7 +123,9 @@ export class CreditsScreen {
           h(
             'div',
             'nvm-cr-block nvm-cr-logo',
-            h('img', { attrs: { src: 'assets/ui/logo.png', alt: 'Null Void Saga', draggable: 'false' } }),
+            import.meta.env.VITE_PROCEDURAL
+              ? h('div', { style: "font-family:'Cinzel',serif;font-size:42px;letter-spacing:0.18em;color:#e8d9b0" }, 'NULL VOID SAGA')
+              : h('img', { attrs: { src: 'assets/ui/logo.png', alt: 'Null Void Saga', draggable: 'false' } }),
             h('div', 'nvm-cr-sub', 'I · ELTÁRIA'),
             divider('nvm-cr-divider'),
           ),
@@ -147,7 +149,7 @@ export class CreditsScreen {
     const hint = this.ending
       ? h('div', 'nvm-hints nvm-cr-hint', h('span', 'nvm-hint', t(S.skip)))
       : h('div', 'nvm-hints nvm-cr-hint', h('span', 'nvm-hint', h('kbd', null, 'Esc'), t(S.close)), h('span', 'nvm-hint', h('kbd', null, 'Space'), t(S.faster)))
-    const art = h('div', { class: 'nvm-cr-art', style: "background-image:url('assets/ui/title_bg.jpg')" })
+    const art = h('div', { class: 'nvm-cr-art', style: import.meta.env.VITE_PROCEDURAL ? '' : "background-image:url('assets/ui/title_bg.jpg')" })
     layer.root.append(h('div', 'nvm-cr-bg', art, h('div', 'nvm-cr-stars')), viewport, end, hint)
     if (this.ending && (this.stopped || reducedMotion())) end.classList.add('show')
     this.roll = roll
