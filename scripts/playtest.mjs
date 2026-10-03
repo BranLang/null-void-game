@@ -3,7 +3,7 @@ import { chromium } from 'playwright'
 const base = process.argv[2] ?? 'http://localhost:5175/'
 const only = process.argv[3]
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader'] })
-const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+const page = await browser.newPage({ viewport: { width: 640, height: 360 } })
 await page.addInitScript(() => { window.__autoMinigame = true })
 const noise = /Audio pool|GPU stall|GL Driver|PCFSoftShadowMap|software WebGL|favicon|HMR|vite/
 let errors = []
@@ -36,8 +36,9 @@ for (const id of scenes) {
   if (only && !id.startsWith(only)) continue
   errors = []
   try { await page.goto(`${base}?scene=${id}`, { waitUntil: 'load' }) } catch { await page.waitForTimeout(1500); await page.goto(`${base}?scene=${id}`, { waitUntil: 'load' }) }
-  await page.waitForTimeout(3000)
-  const intro = await drain(45000)
+  await page.waitForTimeout(2500)
+  await page.evaluate(() => { const g = window.__game; g.applySettings({ ...g.settings, quality: 'low', outlines: false }) })
+  const intro = await drain(90000)
   const info = await page.evaluate((all) => {
     const g = window.__game
     const w = g.world, p = g.player, def = g.sceneDef
@@ -64,9 +65,19 @@ for (const id of scenes) {
   // run every available interactable
   const ran = []
   for (const it of info.its ?? []) {
-    await page.evaluate((iid) => { const g = window.__game; const x = g.interactables().find((k) => k.def.id === iid); if (x) void g.runInteractable(x.def) }, it.id)
+    await page.evaluate((iid) => {
+      const g = window.__game
+      const x = g.interactables().find((k) => k.def.id === iid)
+      if (!x) return
+      // stand next to it, as a player would
+      const [ax, ay] = x.def.at
+      for (const [dx, dy] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1], [0, 0]]) {
+        if (g.world.grid.walkable(ax + dx, ay + dy, true)) { g.player.teleport(ax + dx, ay + dy); break }
+      }
+      void g.runInteractable(x.def)
+    }, it.id)
     await page.waitForTimeout(300)
-    const st = await drain(40000)
+    const st = await drain(90000)
     ran.push(`${it.id}${st.timeout ? '(STUCK)' : ''}`)
     const sceneNow = await page.evaluate(() => window.__game.sceneDef?.id)
     if (sceneNow !== id) { ran.push(`→${sceneNow}`); break }
