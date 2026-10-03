@@ -59,19 +59,19 @@ async function duskIfReady(g: GameAPI): Promise<void> {
   await g.wait(900)
   await g.narrate(l('Slnko zapadlo za mraky pod nimi a zlato sa z obalu stiahlo ako voda z piesku.', 'The sun sank into the clouds below them, and the gold drained off the envelope like water into sand.'))
   await g.narrate(l('Po západe ťahalo na nákladnej palube tak, že starý nakladač prestal predstierať, že tých dvoch z Diss nevidí.', 'After sundown the wind dragged across the cargo deck so hard that the old loader stopped pretending not to see the two from Diss.'))
-  await g.walk('loader', [9, 8])
+  await g.walk('loader', [9, 7])
   g.face('loader', 'player')
   await g.focus('loader', { ms: 700 })
   g.emote('loader', '…')
   await g.narrate(l('Kývol bradou k dvierkam kajuty a vošiel prvý.', 'He jerked his chin at the cabin hatch and went in first.'))
-  await g.walk('loader', [8, 7])
+  await g.walk('loader', [8, 6])
   g.show('loader', false)
   g.sfx('door', 0.6)
   g.pose('flint', 'stand')
   g.teleport('flint', [12, 9], 45)
   g.bark('flint', l('Teplo? Konečne.', 'Warmth? At last.'))
-  void g.walk('boy', [8, 8]).then(() => g.show('boy', false))
-  await g.walk('flint', [8, 8])
+  void g.walk('boy', [8, 6]).then(() => g.show('boy', false))
+  await g.walk('flint', [8, 6])
   g.show('flint', false)
   g.follow()
   g.cinematic(false)
@@ -89,11 +89,11 @@ async function nightScene(g: GameAPI): Promise<void> {
   await g.atmosphere(deckNight, 0)
   for (const a of ['loader', 'boy']) g.show(a, false)
   g.show('flint', true)
-  g.teleport('flint', [13, 9], 90)
+  g.teleport('flint', [12, 8], 90)
   g.pose('flint', 'lie')
-  g.teleport('player', [14, 10], 90)
+  g.teleport('player', [14, 8], 90)
   g.pose('player', 'lie')
-  await g.focus([14, 9], { ms: 10, zoom: 1.15 })
+  await g.focus([13, 8], { ms: 10, zoom: 1.15 })
   await g.wait(900)
   await g.narrate(l('Ležali vonku na vreciach pod obalom, ktorý nad nimi potichu vŕzgal v lanách. Oko bolo zase otvorené, jantárové.', 'They lay outside on the sacks beneath the envelope, which creaked softly above them in its ropes. The Eye was open again, amber.'))
   await g.say('flint', l('Hej.', 'Hey.'))
@@ -180,7 +180,7 @@ export const deck: SceneDef = {
     { type: 'anchor', at: [26, 6], rot: 90 },
   ],
   player: { character: 'arkot', at: [15, 10], facing: 315 },
-  spawns: { door: [8, 7], sacks: [14, 9] },
+  spawns: { door: [8, 7], sacks: [14, 8] },
   actors: [
     {
       id: 'flint',

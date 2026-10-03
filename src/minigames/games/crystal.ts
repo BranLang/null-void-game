@@ -569,7 +569,7 @@ function runCrystal(params: MinigameParams, ctx: MinigameContext): Promise<Minig
         return
       }
       if (rem === 0) {
-        if (good >= need) setTimeout(() => win(false), 900)
+        if (good >= need) setTimeout(() => win(false), 1150)
         else lose(ctx.t(S.failCrack), false)
       }
     }

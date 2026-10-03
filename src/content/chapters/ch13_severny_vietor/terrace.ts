@@ -13,7 +13,7 @@ for (let y = 4; y <= 8; y += 2) for (let x = 3; x <= 13; x += 2) GRAVES.push([x 
 
 const HUNTER_SPOTS: Vec2[] = [
   [9, 6],
-  [11, 4],
+  [10, 3],
   [13, 3],
   [15, 3],
   [8, 9],
@@ -160,7 +160,7 @@ export const terraceScene: SceneDef = {
       // the pups
       for (const [id, to] of [
         ['pup1', [10, 5]],
-        ['pup2', [12, 6]],
+        ['pup2', [12, 5]],
         ['pup3', [5, 6]],
         ['pup4', [7, 7]],
         ['pup5', [15, 5]],
@@ -187,17 +187,17 @@ async function apples(g: GameAPI): Promise<void> {
   g.set('c13.apples')
   g.cinematic(true)
   g.objective(null)
-  await g.walk('flint', [11, 8])
+  await g.walk('flint', [11, 10])
   g.pose('flint', 'kneel')
-  await g.walk('player', [13, 8])
+  await g.walk('player', [14, 10])
   g.pose('player', 'kneel')
   await g.narrate(l('Kľakli si do hustého šedého prachu, jemnejšieho než piesok, v ktorom neostala žiadna pamäť na vodu. Flint mlčky otvoril tašku a vytiahol ovocie. Posledné z Kitsune. Pár jabĺk, pomliaždených, menších, než boli.', 'They knelt in thick grey dust, finer than sand, holding no memory of water. Flint opened his bag without a word and took out the fruit. The last from Kitsune. A few apples, bruised, smaller than they had been.'))
-  await g.walk('pup1', [12, 8])
+  await g.walk('pup1', [12, 10])
   await g.narrate(l('Najmenšie vlča prišlo prvé. Vždy najmenšie: ešte nemá dosť rozumu na strach. Pričuchlo k jablku. Zahryzlo. Nato pribehli ostatné.', 'The smallest pup came first. Always the smallest: not yet enough sense to be afraid. It sniffed the apple. Bit. Then the rest came running.'))
-  void g.walk('pup2', [10, 9])
-  void g.walk('pup3', [12, 9])
-  void g.walk('pup4', [11, 7])
-  void g.walk('pup5', [13, 7])
+  void g.walk('pup2', [10, 11])
+  void g.walk('pup3', [12, 11])
+  void g.walk('pup4', [11, 9])
+  void g.walk('pup5', [13, 9])
   await g.wait(800)
   g.emote('pup1', '♪')
   await g.narrate(l('Flint im hladil srsť medzi ušami. V Kitsune to boli líščatá. Tu vlčatá: väčšie, divšie, ťažšie. Ale rovnako hladné a rovnako zvedavé.', 'Flint stroked the fur between their ears. In Kitsune they had been fox cubs. Here, wolf pups: bigger, wilder, heavier. But just as hungry and just as curious.'))
@@ -247,7 +247,7 @@ async function soldiers(g: GameAPI): Promise<void> {
   void g.walk('h1', [15, 7])
   await g.wait(600)
   g.face('h1', 'dara')
-  await g.say('h1', l('Hrrákk! Grav wérr deddh!', 'Hrrákk! Grav wérr deddh!'), { mood: 'angry' })
+  await g.say('h1', l('Grrejvz! Ze deddh slíp hírr!', 'Grrejvz! Ze deddh slíp hírr!'), { mood: 'angry' })
   await g.narrate(l('Veliteľ hliadky, mladší vlk s jazvou cez ľavé oko, neprehovoril k Dare. Prehovoril cez ňu. K háku zahryznutému do skaly vedľa hrobového kameňa.', 'The patrol leader, a younger wolf with a scar across his left eye, did not speak to Dara. He spoke through her. To the hook biting into the rock beside a grave stone.'))
   g.pose('flint', 'point')
   g.sfx('click', 0.8)

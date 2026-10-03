@@ -554,35 +554,55 @@ function runHeal(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
       g.ellipse(BX + 4, BY + 36, 128, 22, 0, 0, Math.PI * 2)
       g.fill()
       if (hands) {
-        // two cupped hands, palms up
+        // two hands held out to the warmth, palms up, thumbs together
+        const capsule = (x: number, y: number, ang: number, len: number, wd: number) => {
+          g.save()
+          g.translate(x, y)
+          g.rotate(ang)
+          g.beginPath()
+          g.moveTo(0, -wd / 2)
+          g.lineTo(len - wd / 2, -wd / 2)
+          g.arc(len - wd / 2, 0, wd / 2, -Math.PI / 2, Math.PI / 2)
+          g.lineTo(0, wd / 2)
+          g.closePath()
+          g.fill()
+          g.stroke()
+          g.restore()
+        }
+        g.fillStyle = rgba(skin, 1)
+        g.strokeStyle = 'rgba(70,40,40,0.35)'
+        g.lineWidth = 1.2
         for (const s of [-1, 1]) {
           g.save()
-          g.translate(BX + s * 34, BY + 6)
+          g.translate(BX + s * 34, BY + 12)
           g.scale(s, 1)
-          g.fillStyle = rgba(skin, 1)
+          const lens = [24, 30, 29, 23]
+          for (let f = 0; f < 4; f++) capsule(-2 + f * 8.5, -12, -Math.PI / 2 + (f - 1.5) * 0.16 + 0.14, lens[f], 9.5)
+          capsule(-20, -4, -Math.PI * 0.82, 21, 10.5)
           g.beginPath()
-          g.moveTo(-40, 18)
-          g.bezierCurveTo(-46, -6, -20, -22, 10, -16)
-          g.bezierCurveTo(24, -14, 30, -4, 26, 6)
-          g.bezierCurveTo(20, 22, -10, 30, -40, 18)
+          g.ellipse(9, 2, 24, 19, 0.08, 0, Math.PI * 2)
           g.fill()
-          g.strokeStyle = 'rgba(60,30,30,0.35)'
-          g.lineWidth = 1.2
-          for (let f = 0; f < 3; f++) {
-            g.beginPath()
-            g.moveTo(-8 + f * 9, -15 + f * 1.5)
-            g.quadraticCurveTo(-2 + f * 9, -4, -6 + f * 8, 8)
-            g.stroke()
-          }
+          g.stroke()
+          // palm crease
+          g.beginPath()
+          g.moveTo(-4, 4)
+          g.quadraticCurveTo(10, -2, 24, 6)
+          g.stroke()
           g.restore()
         }
         // frost on the fingertips melting away
         if (w < 1) {
-          g.fillStyle = `rgba(220,236,255,${0.5 * (1 - w)})`
-          for (let i = 0; i < 9; i++) {
-            g.beginPath()
-            g.arc(BX - 60 + i * 15, BY - 10 + Math.sin(i * 2.3) * 6, 2 + (i % 3), 0, Math.PI * 2)
-            g.fill()
+          g.fillStyle = `rgba(225,240,255,${0.65 * (1 - w)})`
+          for (const s of [-1, 1]) {
+            for (let f = 0; f < 4; f++) {
+              const a = -Math.PI / 2 + (f - 1.5) * 0.16 + 0.14
+              const len = [24, 30, 29, 23][f]
+              const fx = BX + s * (34 + (-2 + f * 8.5) + Math.cos(a) * (len - 4))
+              const fy = BY + 12 - 12 + Math.sin(a) * (len - 4)
+              g.beginPath()
+              g.arc(fx, fy, 3, 0, Math.PI * 2)
+              g.fill()
+            }
           }
         }
         return
@@ -611,13 +631,13 @@ function runHeal(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
       const hy = -2
       g.fillStyle = rgba(skin, 1)
       g.beginPath()
-      g.arc(hx, hy, 23, 0, Math.PI * 2)
+      g.arc(hx, hy, 25, 0, Math.PI * 2)
       g.fill()
       // little cap of the swaddle
       g.fillStyle = '#cdbfa8'
       g.beginPath()
-      g.arc(hx + 4, hy, 25, -Math.PI * 0.55, Math.PI * 0.55, false)
-      g.arc(hx + 2, hy, 18, Math.PI * 0.5, -Math.PI * 0.5, true)
+      g.arc(hx + 4, hy, 27, -Math.PI * 0.55, Math.PI * 0.55, false)
+      g.arc(hx + 3, hy, 19, Math.PI * 0.5, -Math.PI * 0.5, true)
       g.fill()
       // face (closed eyes; a soft mouth once breathing)
       g.strokeStyle = 'rgba(60,40,40,0.75)'
@@ -724,10 +744,32 @@ function runHeal(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
           g.arc(orbX, orbY, r * 2 + 8, -Math.PI / 2, -Math.PI / 2 + pr * Math.PI * 2)
           g.stroke()
           if (pr >= 0.999 && charge > 0.02) {
-            g.fillStyle = 'rgba(255,230,170,0.9)'
-            g.font = '600 13px Cinzel, serif'
-            g.textAlign = 'center'
-            g.fillText('→', orbX, orbY - r * 2 - 18)
+            // little key cap: "press Right now"
+            const kx = orbX
+            const ky = orbY - r * 2 - 26
+            g.fillStyle = 'rgba(30,18,10,0.8)'
+            g.strokeStyle = 'rgba(255,214,160,0.9)'
+            g.lineWidth = 1.2
+            g.beginPath()
+            g.moveTo(kx - 9, ky - 11)
+            g.arcTo(kx + 13, ky - 11, kx + 13, ky + 11, 4)
+            g.arcTo(kx + 13, ky + 11, kx - 13, ky + 11, 4)
+            g.arcTo(kx - 13, ky + 11, kx - 13, ky - 11, 4)
+            g.arcTo(kx - 13, ky - 11, kx + 13, ky - 11, 4)
+            g.closePath()
+            g.fill()
+            g.stroke()
+            g.strokeStyle = 'rgba(255,236,200,1)'
+            g.lineWidth = 2
+            g.lineCap = 'round'
+            g.beginPath()
+            g.moveTo(kx - 6, ky)
+            g.lineTo(kx + 6, ky)
+            g.moveTo(kx + 1, ky - 5)
+            g.lineTo(kx + 6, ky)
+            g.lineTo(kx + 1, ky + 5)
+            g.stroke()
+            g.lineCap = 'butt'
           }
         }
       }
