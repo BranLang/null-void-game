@@ -116,6 +116,12 @@ export function richText(body: string, pClass = ''): DocumentFragment {
 // formatting
 // ============================================================================
 
+/** Substitute `{name}` placeholders in both languages of an L. */
+export function fill(s: L, vars: Record<string, string | number>): L {
+  const sub = (x: string) => Object.entries(vars).reduce((acc, [k, v]) => acc.split(`{${k}}`).join(String(v)), x)
+  return { sk: sub(s.sk), en: sub(s.en) }
+}
+
 export function formatPlaytime(seconds: number, withSeconds = false): string {
   const total = Math.max(0, Math.floor(seconds))
   const hh = Math.floor(total / 3600)

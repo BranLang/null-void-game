@@ -203,8 +203,8 @@ export class World {
   // ------------------------------------------------------------------ markers for interactables
   addMarker(id: string, at: Vec2, height = 1.6): void {
     const g = new THREE.Group()
-    const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffe2a0').multiplyScalar(2.2), toneMapped: false, transparent: true, opacity: 0.9 })
-    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.075, 0), mat)
+    const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffe2a0').multiplyScalar(1.25), toneMapped: false, transparent: true, opacity: 0.85 })
+    const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.055, 0), mat)
     gem.scale.y = 1.6
     g.add(gem)
     const ring = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.19, 24), mat)

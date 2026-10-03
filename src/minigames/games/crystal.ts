@@ -57,7 +57,7 @@ const RIB = [
 const RIB_T = [0.12, 0.3, 0.5, 0.7, 0.88]
 const RIB_SIDE: (1 | -1)[] = [1, -1, 1, -1, 1]
 const RIB_HALF = 17
-const JAR = { x: 745, y: 405 }
+const JAR = { x: 745, y: 384 }
 const EYE = { x: 738, y: 44 }
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v)
@@ -455,6 +455,15 @@ function runCrystal(params: MinigameParams, ctx: MinigameContext): Promise<Minig
 
     // ------------------------------------------------------------------ state
     let crystals = generate(rnd)
+    // dev builds expose the grain angles for automated play-tests
+    const debugGrain = () => {
+      if (import.meta.env.DEV) {
+        canvas.dataset.debug = JSON.stringify(
+          crystals.map((c) => ({ grain: Math.round(c.grain), x: Math.round(c.bx + Math.cos(c.axis * DEG) * c.len * 0.5), y: Math.round(c.by - Math.sin(c.axis * DEG) * c.len * 0.5) })),
+        )
+      }
+    }
+    debugGrain()
     let good = 0
     let elapsed = 0
     let noise = 0
@@ -599,6 +608,7 @@ function runCrystal(params: MinigameParams, ctx: MinigameContext): Promise<Minig
     function reset(): void {
       rnd = mulberry((Math.random() * 1e9) | 0)
       crystals = generate(rnd)
+      debugGrain()
       good = 0
       elapsed = 0
       noise = 0
@@ -928,19 +938,27 @@ function runCrystal(params: MinigameParams, ctx: MinigameContext): Promise<Minig
         g.fillStyle = gr
         g.fillRect(0, y - r, r, r * 2)
       }
-      // tendrils
+      // tendrils: tapered, wavy strands creeping out of the mass
       g.lineCap = 'round'
-      for (let k = 0; k < 7; k++) {
-        const y0 = 40 + k * 66 + Math.sin(time * 0.8 + k) * 10
-        const len = reach * (0.9 + 0.35 * Math.sin(time * 0.9 + k * 1.9))
-        const sway = Math.sin(time * 1.4 + k * 2.1) * 26
-        for (let s = 0; s < 3; s++) {
-          g.strokeStyle = `rgba(4,2,8,${0.5 - s * 0.12})`
-          g.lineWidth = 9 - s * 3
+      for (let k = 0; k < 9; k++) {
+        const y0 = 30 + k * 52 + Math.sin(time * 0.7 + k * 1.3) * 12
+        const len = reach * (0.75 + 0.4 * (0.5 + 0.5 * Math.sin(time * 0.6 + k * 1.9)))
+        const amp = 10 + 14 * Math.sin(k * 2.7) ** 2
+        let px = 0
+        let py = y0
+        const N = 14
+        for (let sgm = 1; sgm <= N; sgm++) {
+          const u = sgm / N
+          const x = len * u
+          const y = y0 + Math.sin(u * 4.2 + time * 1.6 + k * 2.2) * amp * u + Math.sin(time * 0.9 + k) * 6 * u
+          g.strokeStyle = `rgba(3,1,7,${0.85 * (1 - u * 0.75)})`
+          g.lineWidth = 11 * (1 - u) + 1
           g.beginPath()
-          g.moveTo(0, y0)
-          g.bezierCurveTo(len * 0.4, y0 + sway, len * 0.7, y0 - sway * 0.6, len, y0 + sway * 0.4)
+          g.moveTo(px, py)
+          g.lineTo(x, y)
           g.stroke()
+          px = x
+          py = y
         }
       }
       // eyes
@@ -974,9 +992,9 @@ function runCrystal(params: MinigameParams, ctx: MinigameContext): Promise<Minig
       g.save()
       const open = Math.max(0.06, p)
       g.beginPath()
-      g.moveTo(x - 30, y)
-      g.quadraticCurveTo(x, y - 24 * open, x + 30, y)
-      g.quadraticCurveTo(x, y + 24 * open, x - 30, y)
+      g.moveTo(x - 36, y)
+      g.quadraticCurveTo(x, y - 30 * open, x + 36, y)
+      g.quadraticCurveTo(x, y + 30 * open, x - 36, y)
       g.closePath()
       g.save()
       g.clip()
@@ -986,10 +1004,10 @@ function runCrystal(params: MinigameParams, ctx: MinigameContext): Promise<Minig
       iris.addColorStop(0.35, mix(hex('#b77dff'), hex('#ff4a5a'), danger))
       iris.addColorStop(1, mix(hex('#3a1a60'), hex('#5a0a14'), danger))
       g.fillStyle = 'rgba(230,225,240,0.85)'
-      g.fillRect(x - 32, y - 26, 64, 52)
+      g.fillRect(x - 38, y - 30, 76, 60)
       g.fillStyle = iris
       g.beginPath()
-      g.arc(x, y, 12, 0, Math.PI * 2)
+      g.arc(x, y, 14, 0, Math.PI * 2)
       g.fill()
       g.restore()
       g.strokeStyle = danger > 0 ? `rgba(255,120,130,${0.6 + 0.4 * danger})` : 'rgba(230,220,240,0.7)'
@@ -998,7 +1016,7 @@ function runCrystal(params: MinigameParams, ctx: MinigameContext): Promise<Minig
       g.font = '600 9px Cinzel, serif'
       g.textAlign = 'center'
       g.fillStyle = 'rgba(230,220,240,0.6)'
-      g.fillText(ctx.t(S.watcher).toUpperCase(), x, y + 30)
+      g.fillText(ctx.t(S.watcher).toUpperCase(), x, y + 34)
       g.restore()
     }
 
