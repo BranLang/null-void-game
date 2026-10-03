@@ -155,7 +155,6 @@ const TEXT = {
   ),
   moves: l('Ťahy: {n}', 'Moves: {n}'),
   reset: l('Začať odznova', 'Start over'),
-  stuck: l('Ak sa voda zasekla, môžeš začať odznova.', 'If the water is stuck, you can start over.'),
 }
 
 // ---------------------------------------------------------------------------

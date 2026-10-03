@@ -11,6 +11,7 @@
  * params: {
  *   title?: L, subtitle?: L
  *   target?: 'baby' | 'hands'   (default 'baby'; 'hands' = warming frozen hands)
+ *   allowFail?: boolean          on failure also offer "Continue", resolving { success: false }
  * }
  * result: { success, score: 0..1 (fuel left, torn streams), data: { breaks, fuelLeft } }
  */
@@ -143,6 +144,7 @@ function runHeal(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
   const title = isL(params.title) ? params.title : TEXT.title
   const subtitle = isL(params.subtitle) ? params.subtitle : TEXT.subtitle
   const hands = params.target === 'hands'
+  const allowFail = params.allowFail === true
   const rm = ctx.assist.reducedMotion
 
   return new Promise<MinigameResult>((resolve) => {
@@ -268,6 +270,7 @@ function runHeal(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
       card.buttons.replaceChildren()
       card.buttons.appendChild(button(ctx.t(UI_STRINGS.retry), restart, true))
       if (ctx.assist.skipAllowed) card.buttons.appendChild(button(ctx.t(UI_STRINGS.skip), () => finish({ success: true, score: 0, data: { skipped: true } })))
+      if (allowFail) card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: false, score: 0, data: { breaks, warmth: Math.round(warmth * 100) / 100 } })))
       fit(true)
     }
 

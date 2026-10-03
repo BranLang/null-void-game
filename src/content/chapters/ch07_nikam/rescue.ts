@@ -376,7 +376,7 @@ const scene: SceneDef = {
     // the pirates who stayed behind
     { id: 'g1', character: 'c7_pirate1', at: [5, 13], guard: { patrol: [[5, 13], [11, 13], [11, 17], [5, 17]], pause: 1500, range: 5, fov: 75 } },
     { id: 'g2', character: 'c7_kicker', at: [15, 19], facing: 215, guard: { range: 6, fov: 70, sweep: 55 } },
-    { id: 'g3', character: 'c7_pirate3', at: [4, 21], guard: { patrol: [[4, 21], [9, 19], [9, 24], [4, 24]], pause: 1800, range: 5, fov: 70 } },
+    { id: 'g3', character: 'c7_pirate3', at: [4, 21], guard: { patrol: [[4, 21], [9, 19], [9, 24], [5, 24]], pause: 1800, range: 5, fov: 70 } },
     { id: 'g4', character: 'c7_pirate4', at: [19, 15], facing: 225, guard: { range: 6, fov: 65, sweep: 40 } },
     { id: 'g5', character: 'c7_pirate5', at: [12, 11], guard: { patrol: [[12, 11], [18, 11], [17, 13], [13, 13]], pause: 1300, range: 5, fov: 70 } },
     // the crowd fighting the fire on the clearing

@@ -379,6 +379,9 @@ function runCipher(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
     const parchment = buildParchment()
 
     // ------------------------------------------------------------------ state
+    let arm = 90
+    let armTarget = 90
+    let lastTick = 90
     let groupSyms: Sym[] = []
     let stars: Star[] = []
     let dimStars: { x: number; y: number; a: number }[] = []
@@ -387,9 +390,6 @@ function runCipher(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
     let mistakes = 0
     let blots: { x: number; y: number; r: number; seed: number }[] = []
     let lit: number[] = []
-    let arm = 90
-    let armTarget = 90
-    let lastTick = 90
     let dragging = false
     let beam: Beam | null = null
     let mode: 'play' | 'beam' | 'done' | 'failed' = 'play'
@@ -447,6 +447,11 @@ function runCipher(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
       lit = course.map(() => 0)
       blots = []
       mistakes = 0
+      // start the arm in an empty gap, well away from the first answer
+      const first = stars.find((st) => st.step === 0)
+      const gapOk = (a: number) => stars.every((st) => Math.abs(st.ang - a) > 6) && (!first || Math.abs(first.ang - a) > 25)
+      arm = armTarget = [24, 156, 60, 120, 40, 140, 90].find(gapOk) ?? 90
+      lastTick = arm
       // dev builds expose the star layout for automated play-tests
       if (import.meta.env.DEV) canvas.dataset.debug = JSON.stringify(stars.map((st) => ({ ang: Math.round(st.ang * 10) / 10, r: Math.round(st.r), step: st.step })))
     }

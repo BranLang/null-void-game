@@ -34,7 +34,7 @@ const S = {
   chronoSub: { sk: 'deň Ahilu · 21 hodín', en: 'an Ahil day · 21 hours' },
   dayRibbon: { sk: 'jeden deň', en: 'one day' },
   h1: {
-    sk: 'Tami každý večer cvakne chronografom tri cvaknutia dopredu, aby dobehol otcov deň: 21 hodín a ešte tri. Otcov deň mal 24 hodín, a predsa bol rovnako dlhý. Rozhoduje, aká časť dňa už ubehla.',
+    sk: 'Tami každý večer posunie chronograf o tri cvaknutia dopredu, aby dobehol otcov deň: 21 hodín a ešte tri. Otcov deň mal 24 hodín, a predsa bol rovnako dlhý. Rozhoduje, aká časť dňa už ubehla.',
     en: "Every evening Tami clicks her chronograph three clicks forward so it catches up with father's day: 21 hours and three more. Father's day had 24 hours, yet it was just as long. What matters is how much of the day has passed.",
   },
   h2: { sk: '{time} na Taminom chronografe je {frac} dňa.', en: "{time} on Tami's chronograph is {frac} of the day." },
@@ -589,7 +589,11 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       return r
     }
 
-    const hintBtn = button(`${ctx.t(S.hintBtn)} (H)`, () => useHint())
+    // blur after a mouse click so Enter keeps meaning "swing the pendulum"
+    const hintBtn = button(`${ctx.t(S.hintBtn)} (H)`, () => {
+      useHint()
+      hintBtn.blur()
+    })
     const swingBtn = button(`${ctx.t(S.swing)} ⏎`, () => swing(), true)
     card.buttons.append(hintBtn, swingBtn)
 

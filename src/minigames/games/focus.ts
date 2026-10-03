@@ -12,6 +12,7 @@
  *   title?: L, subtitle?: L
  *   stakes?: boolean                 a strain meter fills while holding; frost creeps over the
  *                                    screen edges; strain 100% = failure
+ *   allowFail?: boolean              on failure also offer "Continue", resolving { success: false }
  * }
  * result: { success, score: 0..1, data: { melts, misfires } }
  */
@@ -234,6 +235,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
   const thoughts = custom.length ? custom : DEFAULT_THOUGHTS
   const duration = typeof params.duration === 'number' && params.duration > 1 ? params.duration : 14
   const stakes = params.stakes === true
+  const allowFail = params.allowFail === true
   const title = isL(params.title) ? params.title : TEXT.title
   const subtitle = isL(params.subtitle) ? params.subtitle : TEXT.subtitle
   const rm = ctx.assist.reducedMotion
@@ -456,6 +458,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       card.buttons.replaceChildren()
       card.buttons.appendChild(button(ctx.t(UI_STRINGS.retry), restart, true))
       if (ctx.assist.skipAllowed) card.buttons.appendChild(button(ctx.t(UI_STRINGS.skip), () => finish({ success: true, score: 0, data: { skipped: true } })))
+      if (allowFail) card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: false, score: 0, data: { melts, misfires } })))
       fit(true)
     }
 

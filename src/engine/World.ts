@@ -11,6 +11,7 @@ import { rim, FX_LAYER, markFx } from './toon'
 import { glyphTexture, hashString } from './textures'
 import type { CameraRig } from './CameraRig'
 import type { Renderer } from './Renderer'
+import { PlateLayer } from './plate/PlateLayer'
 
 interface LightSource {
   pos: THREE.Vector3
@@ -77,21 +78,32 @@ export class World {
   readonly mapGroup: THREE.Group
   readonly fxGroup = new THREE.Group()
 
+  /** painted backdrop (plate scenes only) */
+  readonly plate: PlateLayer | null = null
+
   constructor(
     readonly def: SceneDef,
     private renderer: Renderer,
     private rig: CameraRig,
+    plateTexture?: THREE.Texture,
   ) {
     this.grid = new Grid(def.map)
     const built = buildMap(this.grid)
     this.mapGroup = built.group
     this.scene.add(built.group)
+    if (def.plate && plateTexture) {
+      this.plate = new PlateLayer(def.plate, plateTexture)
+      this.scene.add(this.plate.group)
+      built.group.visible = false
+      this.sky.mesh.visible = false
+    }
+    renderer.setToneMapping(!this.plate)
     built.group.traverse((o) => {
       const mesh = o as THREE.Mesh
       if (mesh.isMesh && mesh.geometry?.attributes.normal && !mesh.name.startsWith('liquid')) this.floorMeshes.push(mesh)
     })
     for (const lq of built.liquids) markFx(lq)
-    this.scene.add(this.sky.mesh)
+    if (!this.plate) this.scene.add(this.sky.mesh)
     markFx(this.sky.mesh)
     this.scene.add(this.hemi)
     this.sun.castShadow = true
@@ -338,6 +350,10 @@ export class World {
   // ------------------------------------------------------------------ picking
   pickCell(ndcX: number, ndcY: number): Vec2 | null {
     this.raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), this.rig.camera)
+    if (this.plate) {
+      const hit = this.raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), new THREE.Vector3())
+      return hit ? [Math.round(hit.x), Math.round(hit.z)] : null
+    }
     this.raycaster.layers.set(0)
     const hits = this.raycaster.intersectObjects(this.floorMeshes, false)
     for (const h of hits) {
@@ -456,6 +472,7 @@ export class World {
   }
 
   dispose(): void {
+    this.plate?.dispose()
     this.particles.dispose()
     disposeLiquids()
     this.scene.traverse((o) => {

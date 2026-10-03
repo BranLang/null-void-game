@@ -28,6 +28,9 @@ import { SaveLoadMenu } from '../ui/menus/SaveLoadMenu'
 import { CodexScreen } from '../ui/menus/CodexScreen'
 import { CreditsScreen } from '../ui/menus/CreditsScreen'
 import { ChapterSelect } from '../ui/menus/ChapterSelect'
+import { loadTexture } from '../engine/plate/PlateLayer'
+import { preloadSprites } from '../engine/characters/SpriteCharacter'
+import { SPRITES } from '../content/sprites'
 import { openReader, anyLayerOpen, syncRootSettings } from '../ui/menus/Reader'
 import { UI } from './strings'
 
@@ -109,10 +112,11 @@ export class Game implements MenuHost {
     this.ui = new GameUI(document.body)
     this.portraits = new Portraits(this.renderer.renderer)
     this.director = new Director(this)
-    this.chapters = loadChapters()
+    const all = loadChapters()
+    this.chapters = all.filter((c) => !c.hidden)
     const extra = this.chapters.flatMap((c) => c.codex ?? [])
     this.codexEntries = [...CODEX, ...extra]
-    for (const ch of this.chapters) for (const sc of ch.scenes) this.sceneIndex.set(sc.id, { chapter: ch, scene: sc })
+    for (const ch of all) for (const sc of ch.scenes) this.sceneIndex.set(sc.id, { chapter: ch, scene: sc })
     this.menus = {
       title: new TitleScreen(this),
       pause: new PauseMenu(this),
@@ -360,11 +364,25 @@ export class Game implements MenuHost {
       this.state.abilities.clear()
       def.player.abilities.forEach((a) => this.state.abilities.add(a))
     }
-    const world = new World(def, this.renderer, this.rig)
+    let plateTex: THREE.Texture | undefined
+    if (def.plate) {
+      const sprites = new Set<string>()
+      for (const c of [def.player.character, ...(def.actors ?? []).map((a) => a.character)]) if (SPRITES[c]) sprites.add(SPRITES[c])
+      const [tex] = await Promise.all([loadTexture(def.plate.src).catch(() => undefined), preloadSprites([...sprites])])
+      plateTex = tex
+    }
+    const world = new World(def, this.renderer, this.rig, plateTex)
     this.world = world
-    this.rig.setViewHeight(def.camera?.viewHeight ?? 12.5)
+    this.rig.setViewHeight(def.camera?.viewHeight ?? (world.plate ? 99 : 12.5))
+    if (world.plate) {
+      const f = world.plate.frame
+      this.rig.setPlate(new THREE.Vector3(f.cx, 0, f.cz), f.W, f.H)
+      this.rig.setBounds(-1e4, -1e4, 1e4, 1e4)
+    } else {
+      this.rig.setPlate(null)
+      this.rig.setBounds(-2, -2, world.grid.width + 1, world.grid.height + 1)
+    }
     this.rig.setZoom(def.camera?.zoom ?? 1, true)
-    this.rig.setBounds(-2, -2, world.grid.width + 1, world.grid.height + 1)
     // player
     let start: Vec2 = def.player.at
     let facing = def.player.facing ?? 0

@@ -61,9 +61,21 @@ export class CameraRig {
     return this.dir.clone()
   }
 
+  /** Painted plate bounds: the view never shows past the edges of the image. */
+  private plate: { center: THREE.Vector3; w: number; h: number } | null = null
+
+  setPlate(center: THREE.Vector3 | null, w = 0, h = 0): void {
+    this.plate = center ? { center: center.clone(), w, h } : null
+    this.resize()
+  }
+
   resize(): void {
     const aspect = window.innerWidth / Math.max(1, window.innerHeight)
-    const h = this.viewHeight / this.zoom
+    let h = this.viewHeight / this.zoom
+    if (this.plate) {
+      const cover = Math.min(this.plate.h, this.plate.w / aspect)
+      h = Math.min(cover / this.zoom, cover)
+    }
     this.camera.left = (-h * aspect) / 2
     this.camera.right = (h * aspect) / 2
     this.camera.top = h / 2
@@ -160,6 +172,7 @@ export class CameraRig {
       this.target.x = THREE.MathUtils.clamp(this.target.x, this.bounds.min.x, this.bounds.max.x)
       this.target.z = THREE.MathUtils.clamp(this.target.z, this.bounds.min.y, this.bounds.max.y)
     }
+    this.clampToPlate()
     this.apply()
     if (this.shakeTime > 0 && !reducedMotion) {
       this.shakeTime -= dt
@@ -169,6 +182,23 @@ export class CameraRig {
       this.camera.position.y += (Math.random() - 0.5) * s
       this.camera.position.z += (Math.random() - 0.5) * s
     }
+  }
+
+  private clampToPlate(): void {
+    const p = this.plate
+    if (!p) return
+    const right = new THREE.Vector3(-this.dir.z, 0, this.dir.x).negate()
+    const up = new THREE.Vector3().crossVectors(this.dir, right)
+    const d = this.target.clone().sub(p.center)
+    const halfW = (this.camera.right - this.camera.left) / 2
+    const halfH = (this.camera.top - this.camera.bottom) / 2
+    const sx = d.dot(right)
+    const sy = d.dot(up)
+    const depth = d.dot(this.dir)
+    const cx = THREE.MathUtils.clamp(sx, -p.w / 2 + halfW, p.w / 2 - halfW)
+    const cy = THREE.MathUtils.clamp(sy, -p.h / 2 + halfH, p.h / 2 - halfH)
+    if (cx === sx && cy === sy) return
+    this.target.copy(p.center).addScaledVector(right, cx).addScaledVector(up, cy).addScaledVector(this.dir, depth)
   }
 
   private apply(): void {

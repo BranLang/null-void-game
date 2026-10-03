@@ -77,6 +77,8 @@ registerProp('c1_envelope', {
     const wid = num(ctx, 'w', 5)
     const drop = num(ctx, 'drop', 7)
     const deck = num(ctx, 'deck', 4)
+    const zf = num(ctx, 'zf', deck)
+    const zn = num(ctx, 'zn', deck)
     const color = tint(ctx, '#cdb98e')
     const g = new THREE.Group()
     const env = new THREE.Mesh(
@@ -104,8 +106,9 @@ registerProp('c1_envelope', {
     for (let i = 0; i < 6; i++) {
       const x = -len * 0.34 + (i * len * 0.68) / 5
       for (const s of [-1, 1]) {
-        g.add(rod([x, -wid * 0.36, s * wid * 0.22], [x * 0.92, -drop + 0.6, s * deck], 0.018, 0.018, rope, 4))
-        g.add(rod([x, -wid * 0.36, s * wid * 0.22], [x * 0.92 + 1.2, -drop + 0.6, s * deck], 0.012, 0.012, rope, 4))
+        const end = s < 0 ? -zf : zn
+        g.add(rod([x, -wid * 0.36, s * wid * 0.22], [x * 0.92, -drop + 0.6, end], 0.018, 0.018, rope, 4))
+        g.add(rod([x, -wid * 0.36, s * wid * 0.22], [x * 0.92 + 1.2, -drop + 0.6, end], 0.012, 0.012, rope, 4))
       }
     }
     // tail fins
@@ -753,4 +756,90 @@ registerProp('c1_ledger', {
       g.add(rot(torus(0.07, 0.015, M(PAL.rope), 0.2, 0.5, -0.16, 4, 10), Math.PI / 2, 0, 0))
       return g
     }),
+})
+
+// ------------------------------------------------------------------ gondola prow and keel (the deck is a rectangle of tiles)
+function prowShape(len: number, half: number): THREE.Shape {
+  const sh = new THREE.Shape()
+  sh.moveTo(0, -half)
+  sh.quadraticCurveTo(len * 0.75, -half * 0.95, len, 0)
+  sh.quadraticCurveTo(len * 0.75, half * 0.95, 0, half)
+  sh.closePath()
+  return sh
+}
+
+/** A pointed foredeck that continues the deck past its last tile column (+X). */
+registerProp('c1_prow', {
+  solid: false,
+  build: (ctx) => {
+    const len = num(ctx, 'len', 3.6)
+    const half = num(ctx, 'half', 5)
+    const top = num(ctx, 'top', 0.75)
+    return cachedBuild(`c1-prow|${len}|${half}|${top}`, () => {
+      const g = new THREE.Group()
+      const hullGeo = new THREE.ExtrudeGeometry(prowShape(len, half), { depth: top + 1.6, bevelEnabled: false, curveSegments: 14 })
+      hullGeo.rotateX(-Math.PI / 2)
+      hullGeo.translate(0, -1.6, 0)
+      const hull = new THREE.Mesh(hullGeo, M('#6b4430'))
+      hull.castShadow = true
+      hull.receiveShadow = true
+      g.add(hull)
+      const deckGeo = new THREE.ShapeGeometry(prowShape(len - 0.15, half - 0.15), 14)
+      deckGeo.rotateX(-Math.PI / 2)
+      const deckTop = new THREE.Mesh(deckGeo, M('#a27a52'))
+      deckTop.position.set(0.05, top + 0.005, 0)
+      deckTop.receiveShadow = true
+      g.add(deckTop)
+      // plank seams
+      for (let i = 1; i < 5; i++) g.add(bx(0.03, 0.01, half * 2 * (1 - i / 5.5), M('#7a5638'), (len * i) / 5.2, top + 0.01, 0))
+      // bulwark rail along the curved edges
+      const rail = M(PAL.woodDark)
+      const pts: V3[] = []
+      for (let i = 0; i <= 12; i++) {
+        const t = i / 12
+        const a = -1 + 2 * t
+        const x = len * (1 - a * a) * 0.98
+        const z = a * half * (0.98 - 0.02)
+        pts.push([x, top + 0.55, z])
+      }
+      for (let i = 0; i < pts.length - 1; i++) g.add(rod(pts[i], pts[i + 1], 0.05, 0.05, rail, 6))
+      for (let i = 0; i < pts.length; i += 2) g.add(rod([pts[i][0], top, pts[i][2]], pts[i], 0.035, 0.035, rail, 5))
+      // brass nose and a figurehead lamp (no flame: a jar of glowing flowers)
+      g.add(rot(cn(0.2, 0.7, M(PAL.brass), len + 0.1, top - 0.1, 0, 10), 0, 0, -Math.PI / 2))
+      g.add(ring(half * 0.5, 0.03, M(PAL.brass), len * 0.35, top - 0.6, 0, 4, 20))
+      return g
+    })
+  },
+})
+
+/** A tapered keel under the deck slab (the slab bottom is at -1.6). Long axis X. */
+registerProp('c1_keel', {
+  solid: false,
+  build: (ctx) => {
+    const len = num(ctx, 'len', 20)
+    const half = num(ctx, 'half', 5)
+    const depth = num(ctx, 'depth', 1.3)
+    return cachedBuild(`c1-keel|${len}|${half}|${depth}`, () => {
+      const g = new THREE.Group()
+      const sh = new THREE.Shape()
+      sh.moveTo(-half, 0)
+      sh.lineTo(half, 0)
+      sh.lineTo(half * 0.55, -depth * 0.8)
+      sh.lineTo(0, -depth)
+      sh.lineTo(-half * 0.55, -depth * 0.8)
+      sh.closePath()
+      const geo = new THREE.ExtrudeGeometry(sh, { depth: len, bevelEnabled: false })
+      geo.translate(0, 0, -len / 2)
+      geo.rotateY(Math.PI / 2)
+      const keel = new THREE.Mesh(geo, M('#4e3324'))
+      keel.position.y = -1.6
+      keel.castShadow = true
+      keel.receiveShadow = true
+      g.add(keel)
+      // a band of brass rivets along the hull seam
+      g.add(bx(len, 0.08, 0.06, M('#8a6a3a'), 0, -1.68, half - 0.02))
+      g.add(bx(len, 0.08, 0.06, M('#8a6a3a'), 0, -1.68, -half + 0.02))
+      return g
+    })
+  },
 })

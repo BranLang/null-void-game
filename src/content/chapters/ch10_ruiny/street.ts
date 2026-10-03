@@ -117,11 +117,11 @@ const LAMPS: [number, number][] = [
 ]
 
 const morningAmb: AmbienceDef = {
-  sky: { top: '#6c7a86', bottom: '#aab4b8', stars: 0, clouds: 0.5 },
-  fog: { color: '#8e9aa0', near: 8, far: 34 },
-  hemi: { sky: '#c4ced6', ground: '#4a4a40', intensity: 1.15 },
-  sun: { color: '#e8ecf0', intensity: 0.8, dir: [-0.4, 1, 0.5] },
-  exposure: 1.02,
+  sky: { top: '#7d8b96', bottom: '#bcc6c8', stars: 0, clouds: 0.5 },
+  fog: { color: '#a2acb0', near: 10, far: 38 },
+  hemi: { sky: '#d4dde4', ground: '#5a5a4c', intensity: 1.45 },
+  sun: { color: '#eef2f4', intensity: 1.15, dir: [-0.4, 1, 0.5] },
+  exposure: 1.12,
   bloom: { strength: 0.55, threshold: 0.85 },
   grade: { tint: '#e8eef0', saturation: 0.92, contrast: 1.04, vignette: 0.38 },
   particles: [

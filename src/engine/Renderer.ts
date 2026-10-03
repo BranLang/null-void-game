@@ -163,6 +163,11 @@ export class Renderer {
     this.bloom.threshold = threshold
   }
 
+  /** Painted plates are already graded art: they skip ACES tone mapping. */
+  setToneMapping(on: boolean): void {
+    this.renderer.toneMapping = on ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping
+  }
+
   setExposure(e: number): void {
     this.renderer.toneMappingExposure = e
   }

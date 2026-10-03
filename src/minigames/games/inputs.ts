@@ -12,6 +12,7 @@
  *   voice?: L[]          lines the voice says on a miss
  *   title?: L, subtitle?: L
  *   color?: string       glow colour of the signs (hex, default warm copper)
+ *   allowFail?: boolean  on failure also offer "Continue", resolving { success: false }
  * }
  * result: { success, score: hits / (hits + misses), data: { hits, misses } }
  */
@@ -32,7 +33,6 @@ const TEXT = {
     'When a sign flares up, press that key (W, A, S, D, E or Space), or click it.',
   ),
   space: l('MEDZERNÍK', 'SPACE'),
-  heart: l('Údery srdca', 'Heartbeats'),
   will: l('Vôľa', 'Will'),
   done: l('Vybojované. Srdce bije po tvojom.', 'Won back. The heart beats to your rhythm.'),
   fail: l('Hlas ťa stiahol späť pod hladinu.', 'The voice pulls you back beneath the surface.'),
@@ -159,6 +159,7 @@ function runInputs(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
   const subtitle = isL(params.subtitle) ? params.subtitle : TEXT.subtitle
   const color = parseColor(params.color, [255, 178, 122])
   const rm = ctx.assist.reducedMotion
+  const allowFail = params.allowFail === true
 
   return new Promise<MinigameResult>((resolve) => {
     const card = createCard(ctx, title, subtitle)
@@ -187,6 +188,8 @@ function runInputs(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
     let shake = 0
     let endT = 0
     let voiceIdx = Math.floor(Math.random() * voices.length)
+    let lid = 0.6
+    let blink = 0
     const ripples: { x: number; y: number; t: number; c: RGB; big: boolean }[] = []
     const sparks: { x: number; y: number; vx: number; vy: number; life: number; max: number; c: RGB }[] = []
     const motes: Mote[] = Array.from({ length: rm ? 14 : 44 }, () => ({ x: Math.random() * W, y: Math.random() * H, s: 0.4 + Math.random() * 1.4, p: Math.random() * 10 }))
@@ -242,6 +245,7 @@ function runInputs(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
         dark = 1
         if (!rm) shake = 0.4
         burst(prompt.x, prompt.y, VOICE, 18, 120)
+        blink = 1
         ctx.sfx('fail')
       }
       if (hits >= need) win()
@@ -272,6 +276,7 @@ function runInputs(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
       card.buttons.replaceChildren()
       card.buttons.appendChild(button(ctx.t(UI_STRINGS.retry), restart, true))
       if (ctx.assist.skipAllowed) card.buttons.appendChild(button(ctx.t(UI_STRINGS.skip), () => finish({ success: true, score: 0, data: { skipped: true } })))
+      if (allowFail) card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: false, score: Math.round((hits / (hits + missCount)) * 100) / 100, data: { hits, misses: missCount } })))
       fit(true)
     }
 
@@ -517,6 +522,38 @@ function runInputs(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
       g.restore()
     }
 
+    function drawLids(open: number): void {
+      const reach = (1 - open) * H * 0.5
+      if (reach <= 1) return
+      g.save()
+      for (const top of [true, false]) {
+        const yEdge = top ? reach : H - reach
+        const yCorner = top ? reach * 0.2 - 10 : H - reach * 0.2 + 10
+        const yOut = top ? -30 : H + 30
+        g.beginPath()
+        g.moveTo(-30, yOut)
+        g.lineTo(W + 30, yOut)
+        g.lineTo(W + 30, yCorner)
+        g.quadraticCurveTo(W / 2, yEdge + (yEdge - yCorner) * 0.9, -30, yCorner)
+        g.closePath()
+        g.fillStyle = 'rgba(1,3,5,0.94)'
+        g.fill()
+        // feathered rim
+        g.beginPath()
+        g.moveTo(W + 30, yCorner)
+        g.quadraticCurveTo(W / 2, yEdge + (yEdge - yCorner) * 0.9, -30, yCorner)
+        for (const [lw, a] of [
+          [34, 0.25],
+          [16, 0.45],
+        ] as const) {
+          g.lineWidth = lw
+          g.strokeStyle = `rgba(1,3,5,${a})`
+          g.stroke()
+        }
+      }
+      g.restore()
+    }
+
     // ------------------------------------------------------------------ loop
     ctx.loop((rawDt, time) => {
       const dt = Math.max(0, rawDt)
@@ -544,6 +581,10 @@ function runInputs(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
         whisper = { text: nextVoice(), t: 0, x: 120 + Math.random() * (W - 240), y: 70 + Math.random() * (H - 160) }
       }
       heartPulse = Math.max(0, heartPulse - dt * 2.5)
+      // eyelids: won heartbeats open them, misses make them blink shut, losing closes them
+      blink = Math.max(0, blink - dt * 2.2)
+      const lidTarget = phase === 'won' ? 1.2 : phase === 'lost' ? 0.22 : 0.84 + 0.16 * (hits / need) - 0.06 * missCount - blink * 0.45
+      lid += (lidTarget - lid) * Math.min(1, dt * (phase === 'lost' ? 1.2 : 5))
       light = Math.max(0, light - dt * 1.8)
       dark += ((phase === 'won' ? 0 : 0.3 + (missCount / maxMiss) * 0.25) - dark) * Math.min(1, dt * 1.5)
       shake = Math.max(0, shake - dt)
@@ -609,6 +650,7 @@ function runInputs(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
         g.fillStyle = sg
         g.fillRect(-20, -20, W + 40, H + 40)
       }
+      drawLids(lid)
       drawHud(time)
     })
   })

@@ -353,7 +353,7 @@ async function arrival(g: GameAPI): Promise<void> {
   await g.narrate(l('Arkot odložil vrece.', 'Arkot put down the sack.'))
   g.music('main', 2400)
   await g.focus([27, -2], { ms: 1800, zoom: 0.72 })
-  g.particles({ kind: 'steam', count: 46, area: [24, -4, 30, 7], color: '#eef2f6', id: 'itaka_steam' })
+  g.particles({ kind: 'steam', count: 16, area: [25, -6, 29, 6], color: '#dfe2e8', id: 'itaka_steam' })
   g.propVisible('itaka_glide', true)
   const glideStart = g.time
   void g.atmosphere({ fog: { color: '#cdd0d6', near: 6, far: 40 } }, 9000)

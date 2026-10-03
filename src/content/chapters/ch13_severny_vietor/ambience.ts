@@ -18,8 +18,9 @@ export const heavyKitsune: AmbienceDef = {
 /** The Itaka's hold: dark steel and the violet pulse of the Spira boiler. */
 export const hold: AmbienceDef = {
   sky: { top: '#050407', bottom: '#0c0a10', stars: 0 },
-  hemi: { sky: '#5a4a78', ground: '#140f18', intensity: 0.55 },
-  exposure: 1.05,
+  hemi: { sky: '#a89ad0', ground: '#3a3044', intensity: 1.25 },
+  sun: { color: '#c8b8ff', intensity: 0.45, dir: [-0.3, 1, 0.5], shadows: false },
+  exposure: 1.2,
   bloom: { strength: 1.0, radius: 0.6, threshold: 0.72 },
   grade: { tint: '#e6dcff', saturation: 0.9, contrast: 1.12, vignette: 0.6, grain: 0.05 },
   particles: [{ kind: 'motes', count: 40, color: '#b98aff' }],

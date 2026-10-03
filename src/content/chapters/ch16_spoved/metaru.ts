@@ -113,6 +113,9 @@ const clutter: PlacedProp[] = [
   { type: 'mushroom', at: [1, 18], color: '#6dffb8' },
 ]
 
+/** The hangar's set dressing, reused by chapter 17. */
+export const HALL_PROPS: PlacedProp[] = [...ribs, ...pigeons, ...bedding, ...clutter]
+
 // ------------------------------------------------------------------------- people
 const refugees: ActorDef[] = (
   [
@@ -896,7 +899,7 @@ export const metaru: SceneDef = {
   ambience: HALL_DAWN,
   camera: { zoom: 1 },
   map: HALL_MAP,
-  props: [...ribs, ...pigeons, ...bedding, ...clutter],
+  props: HALL_PROPS,
   player: { character: 'c16_yera', at: [5, 1], facing: 0 },
   spawns: { wake: [5, 1], work_in: [27, 2], gate_in: [2, 9] },
   actors: [

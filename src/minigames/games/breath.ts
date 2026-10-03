@@ -11,6 +11,7 @@
  *   twist?: 'eclipse' after the last beat the counter shows the target and asks
  *                     "When will the Eye open?": the player must wait and press on
  *                     the NEXT breath (target + 1); pressing early is a miss.
+ *   allowFail?: boolean  on failure also offer "Continue", resolving { success: false }
  * }
  * result: { success: hitRatio >= 0.7 (and the twist answered), score: hitRatio,
  *           data: { hits, perfect, beats, accuracy (perfect = 1, good = 0.75), twist?: true } }
@@ -49,10 +50,9 @@ const TEXT = {
   miss: l('Vedľa', 'Missed'),
   early: l('Priskoro', 'Too early'),
   eye: l('Kedy sa Oko otvorí?', 'When will the Eye open?'),
-  wait: l('…ešte nie…', '…not yet…'),
   done: l('Arkot prikývne. Počítali ste spolu, nádych za nádychom.', 'Arkot nods. You counted together, breath by breath.'),
   doneEye: l('{n}. Oko sa otvára.', '{n}. The Eye opens.'),
-  failRatio: l('Stratil si rytmus. Arkot začne odznova, trpezlivo.', 'You lost the rhythm. Arkot starts again, patiently.'),
+  failRatio: l('Rytmus sa stratil. Arkot začne odznova, trpezlivo.', 'The rhythm slipped away. Arkot starts again, patiently.'),
   failEarly: l('Priskoro. Oko sa ešte neotvorilo — Arkot by počkal ešte jeden nádych.', 'Too early. The Eye was not open yet — Arkot would have waited one more breath.'),
   failLate: l('Oko sa otvorilo bez teba.', 'The Eye opened without you.'),
 }
@@ -134,6 +134,7 @@ function runBreath(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
   const start = typeof params.start === 'number' ? Math.round(params.start) : 1
   const bpm = typeof params.bpm === 'number' && params.bpm > 4 ? params.bpm : 28
   const twist = params.twist === 'eclipse'
+  const allowFail = params.allowFail === true
   const P = 60 / bpm
   const INHALE = 0.45
   const rm = ctx.assist.reducedMotion
@@ -266,6 +267,10 @@ function runBreath(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
         card.hint.style.color = 'var(--nv-danger)'
         card.buttons.appendChild(button(ctx.t(UI_STRINGS.retry), restart, true))
         if (ctx.assist.skipAllowed) card.buttons.appendChild(button(ctx.t(UI_STRINGS.skip), () => finish({ success: true, score: 0, data: { skipped: true } })))
+        if (allowFail)
+          card.buttons.appendChild(
+            button(ctx.t(UI_STRINGS.continue), () => finish({ success: false, score, data: { hits, perfect, beats, accuracy, ...(twist ? { twist: twistResult === 'hit' } : {}) } })),
+          )
       }
       fit(true)
     }

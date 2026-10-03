@@ -39,8 +39,8 @@ const S = {
   watcher: { sk: 'strážca', en: 'watcher' },
   failWatch: { sk: 'Strážca ťa zbadal skôr, než bol pohár plný.', en: 'The watcher noticed you before the jar was full.' },
   failCrack: { sk: 'Priveľa kryštálov zošedlo. Spira z nich vyprchala.', en: 'Too many crystals drained to grey. The Spira bled out of them.' },
-  win: { sk: '{n} čistých kryštálov v pohári. Pozdĺž vlákna, nikdy naprieč.', en: '{n} clean crystals in the jar. Along the grain, never across.' },
-  winRun: { sk: 'Utekaj! S {n} kryštálmi v pohári sa vytratíš z ruín.', en: 'Run! You slip out of the ruins with {n} crystals in the jar.' },
+  win: { sk: 'V pohári: {jar}. Pozdĺž vlákna, nikdy naprieč.', en: 'In the jar: {jar}. Along the grain, never across.' },
+  winRun: { sk: 'Utekaj! S pohárom kryštálov sa vytratíš z ruín.', en: 'Run! You slip out of the ruins with the jar of crystals.' },
 } satisfies Record<string, L>
 
 const W = 800
@@ -74,6 +74,13 @@ const mix = (a: RGB, b: RGB, t: number, alpha = 1) =>
   `rgba(${Math.round(lerp(a[0], b[0], t))},${Math.round(lerp(a[1], b[1], t))},${Math.round(lerp(a[2], b[2], t))},${alpha})`
 const VIOLET = { base: hex('#3d1474'), mid: hex('#9257ff'), tip: hex('#ecd8ff') }
 const GREY = { base: hex('#303036'), mid: hex('#64646c'), tip: hex('#a3a3aa') }
+
+/** "3 čisté kryštály" / "3 clean crystals" with Slovak plural agreement */
+function cleanCrystals(n: number): L {
+  if (n === 1) return { sk: '1 čistý kryštál', en: '1 clean crystal' }
+  if (n >= 2 && n <= 4) return { sk: `${n} čisté kryštály`, en: `${n} clean crystals` }
+  return { sk: `${n} čistých kryštálov`, en: `${n} clean crystals` }
+}
 
 function bez(t: number): { x: number; y: number } {
   const u = 1 - t
@@ -582,7 +589,7 @@ function runCrystal(params: MinigameParams, ctx: MinigameContext): Promise<Minig
       grip = null
       endText = running ? { text: ctx.t(S.run), color: '#ff5a6a', t: 0 } : null
       ctx.sfx('success')
-      card.hint.textContent = ctx.t(running ? S.winRun : S.win, { n: good })
+      card.hint.textContent = ctx.t(running ? S.winRun : S.win, { jar: ctx.t(cleanCrystals(good)) })
       card.hint.style.color = running ? 'var(--nv-danger)' : 'var(--nv-violet)'
       const score = Math.round((good / TOTAL) * 100) / 100
       const cont = button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score, data: { good } }), true)

@@ -53,7 +53,7 @@ export const HALL = {
   kitchen: [12, 1] as Vec2,
   stairFoot: [15, 7] as Vec2,
   landing: [15, 1] as Vec2,
-  bench: [6, 4] as Vec2,
+  bench: [[5, 2], [5, 3]] as Vec2[],
 }
 
 export type HallMode = 'evening' | 'morning'
@@ -92,11 +92,12 @@ export function hallProps(mode: HallMode): PlacedProp[] {
     { type: 'door', at: [12, 0], params: { open: true }, solid: false },
     // the hearth corner
     { type: 'ch12_couch', at: [10, 3], rot: 270 },
-    { type: 'chair', at: [4, 3], rot: 90, color: '#6a3a26' },
-    { type: 'rug', at: [7, 3], params: { round: true, w: 2.2 }, color: '#7a2a2e' },
-    { type: 'table', at: [7, 4], params: { round: true }, scale: 0.8 },
-    { type: 'candles', at: [7, 4], y: 0.62 },
-    { type: 'bench', at: [6, 4], rot: 180, params: { back: false } },
+    { type: 'bench', at: [5, 2], rot: 90, params: { back: true } },
+    { type: 'bench', at: [5, 3], rot: 90, params: { back: true } },
+    { type: 'rug', at: [7, 3], params: { round: true, w: 2.4 }, color: '#7a2a2e' },
+    { type: 'table', at: [7, 5], params: { round: true }, scale: 0.8 },
+    { type: 'candles', at: [7, 5], y: 0.62 },
+    { type: 'chair', at: [3, 5], rot: 45, color: '#6a3a26' },
     // the rest of the hall
     { type: 'ch12_vitrine', at: [3, 8], params: { item: 'compass' } },
     { type: 'ch12_vitrine', at: [12, 9], params: { item: 'sword' } },

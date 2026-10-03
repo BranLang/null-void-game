@@ -7,6 +7,8 @@ import type { Expression } from '../engine/characters/Face'
 import { PhantomVisual, type PhantomForm } from '../engine/fx/Phantom'
 import type { World } from '../engine/World'
 import { l, type L } from '../i18n/i18n'
+import { SpriteCharacter, yawToDir } from '../engine/characters/SpriteCharacter'
+import { SPRITES } from '../content/sprites'
 
 /** Screen-relative facing (0 = towards camera) to a world yaw for a model facing +Z. */
 export function facingToYaw(deg: number): number {
@@ -17,6 +19,9 @@ export class Actor {
   readonly root = new THREE.Group()
   model: CharacterModel | QuadrupedModel | null = null
   phantom: PhantomVisual | null = null
+  sprite: SpriteCharacter | null = null
+  private pose: Pose = 'stand'
+  private mood: Expression | null = null
   animator: Animator | null = null
   x: number
   y: number
@@ -67,12 +72,22 @@ export class Actor {
   private build(castId: string): void {
     if (this.model) this.root.remove(this.model.rig.root)
     if (this.phantom) this.root.remove(this.phantom.group)
+    if (this.sprite) {
+      this.root.remove(this.sprite.root)
+      this.sprite.dispose()
+    }
     this.model = null
     this.phantom = null
+    this.sprite = null
     const cast = CAST[castId]
     if (!cast) console.warn(`[actor] unknown cast id '${castId}'`)
     const special = cast?.special
-    if (special === 'phantom' || special === 'samael' || this.def.phantom) {
+    const plate = this.world.def.plate
+    if (plate && SPRITES[castId]) {
+      this.sprite = new SpriteCharacter(SPRITES[castId], 1.45 * (this.def.scale ?? 1) * (special === 'samael' ? 1.6 : 1), plate.tint ?? '#ffffff')
+      this.root.add(this.sprite.root)
+      this.animator = null
+    } else if (special === 'phantom' || special === 'samael' || this.def.phantom) {
       const form: PhantomForm = (this.def.phantom?.form as PhantomForm) ?? (special === 'samael' ? 'samael' : 'humanoid')
       this.phantom = new PhantomVisual(form, this.def.phantom?.fibers, this.def.phantom?.reach)
       this.root.add(this.phantom.group)
@@ -94,6 +109,7 @@ export class Actor {
   }
 
   get height(): number {
+    if (this.sprite) return this.sprite.height
     if (this.model) return this.model.rig.height
     return this.phantom?.form === 'samael' ? 3.4 : 1.9
   }
@@ -118,10 +134,12 @@ export class Actor {
   }
 
   setPose(p: Pose): void {
+    this.pose = p
     if (this.animator) this.animator.pose = p
   }
 
   setMood(m: Expression): void {
+    this.mood = m
     if (this.animator) this.animator.expression = m
   }
 
@@ -218,6 +236,7 @@ export class Actor {
     if (this.blockedCell) this.world.grid.block(this.blockedCell[0], this.blockedCell[1], false)
     this.blockedCell = null
     this.world.scene.remove(this.root)
+    this.sprite?.dispose()
   }
 
   private syncTransform(instant = false): void {
@@ -226,7 +245,7 @@ export class Actor {
     this.root.position.x = this.x
     this.root.position.z = this.y
     this.root.position.y = instant ? targetY : THREE.MathUtils.lerp(this.root.position.y, targetY, 0.25)
-    this.root.rotation.y = this.yaw
+    this.root.rotation.y = this.sprite ? 0 : this.yaw
   }
 
   /** Per-frame update; `speedNow` is the current horizontal speed for animation. */
@@ -260,6 +279,18 @@ export class Actor {
       this.animator.speed = speedNow
       this.animator.running = this.running || speedNow > 3.6
       this.animator.update(dt, this.root)
+    }
+    if (this.sprite) {
+      const sp = this.sprite
+      sp.dir = yawToDir(this.yaw)
+      const posed: Partial<Record<Pose, string>> = { kneel: 'kneel', pray: 'kneel', sit: 'kneel', cast: 'cast' }
+      if (speedNow > 0.2) {
+        sp.state = 'walk'
+        sp.rate = Math.max(0.6, speedNow / 2.6)
+      } else if (posed[this.pose]) sp.state = posed[this.pose]!
+      else if (this.mood === 'happy') sp.state = 'happy'
+      else sp.state = 'idle'
+      sp.update(dt)
     }
     if (this.phantom) {
       this.bobT += dt

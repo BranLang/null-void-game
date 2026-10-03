@@ -3,7 +3,7 @@
  * last page; the verse of Tenši and "Ich weiß" (the faith choice); the dust
  * recordings of El's voice from the forbidden electric box; the coil guns.
  */
-import type { SceneDef } from '../../types'
+import type { PlacedProp, SceneDef } from '../../types'
 import type { GameAPI } from '../../../game/GameAPI'
 import { l } from '../../../i18n/i18n'
 import { WORKSHOP_AMB, WORKSHOP_MAP } from './shared'
@@ -233,16 +233,8 @@ async function coils(g: GameAPI): Promise<void> {
   await g.endChapter()
 }
 
-// ------------------------------------------------------------------------- scene
-export const workshop: SceneDef = {
-  id: 'c16_workshop',
-  name: l('Felixova dielňa', 'Felix’s Workshop'),
-  ambience: WORKSHOP_AMB,
-  map: WORKSHOP_MAP,
-  camera: { zoom: 1.25 },
-  player: { character: 'c16_yera', at: [2, 10], facing: 135 },
-  spawns: { door: [2, 10] },
-  props: [
+/** Felix's workshop furniture (reused by chapters 17 and 18). */
+export const WORKSHOP_PROPS: PlacedProp[] = [
     { type: 'boiler', at: [1, 1] },
     { type: 'chalkboard', at: [4, 1], params: { wall: true } },
     { type: 'workbench', at: [8, 1] },
@@ -269,7 +261,18 @@ export const workshop: SceneDef = {
     { type: 'sack', at: [13, 8] },
     { type: 'rug', at: [6, 8], color: '#5a3a2a' },
     { type: 'candles', at: [8, 2] },
-  ],
+]
+
+// ------------------------------------------------------------------------- scene
+export const workshop: SceneDef = {
+  id: 'c16_workshop',
+  name: l('Felixova dielňa', 'Felix’s Workshop'),
+  ambience: WORKSHOP_AMB,
+  map: WORKSHOP_MAP,
+  camera: { zoom: 1.25 },
+  player: { character: 'c16_yera', at: [2, 10], facing: 135 },
+  spawns: { door: [2, 10] },
+  props: WORKSHOP_PROPS,
   actors: [{ id: 'felix', character: 'felix', at: [7, 4], facing: 225 }],
   exits: [{ area: [1, 11, 4, 11], to: 'c16_metaru', spawn: 'work_in' }],
   onEnter: async (g) => {

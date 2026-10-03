@@ -383,7 +383,7 @@ registerProp('ch07_ramp', {
       ramp.add(bx(0.9, 0.06, L, steel, 0, 0, 0))
       for (let i = 0; i < 9; i++) ramp.add(bx(0.86, 0.04, 0.08, plank, 0, 0.06, -L / 2 + 0.15 + i * 0.24))
       for (const s of [-1, 1]) ramp.add(bx(0.05, 0.12, L, M('#262a31'), s * 0.45, 0.02, 0))
-      ramp.rotation.x = -tilt
+      ramp.rotation.x = tilt
       ramp.position.set(0, 0.55, 0)
       g.add(ramp)
       for (const s of [-1, 1]) g.add(rod([s * 0.46, 1.6, -L / 2], [s * 0.46, 0.62, L / 2], 0.015, 0.015, M(PAL.rope), 4))
@@ -582,4 +582,28 @@ registerProp('ch07_star', {
     s[1].scale.setScalar(0.6 + 0.12 * Math.sin(t * 2.1))
     s[1].lookAt(s[1].position.clone().add(new THREE.Vector3(1, 0.8, 1)))
   },
+})
+
+// ---------------------------------------------------------------------------
+// ch07_protractor: the old captain's brass protractor in a bundle of scarves
+// ---------------------------------------------------------------------------
+
+registerProp('ch07_protractor', {
+  solid: false,
+  build: () =>
+    cachedBuild('ch07_protractor', () => {
+      const g = new THREE.Group()
+      const cloth = [M('#8a4a6a'), M('#3f5cb0'), M('#d8c8a0')]
+      for (let i = 0; i < 3; i++) {
+        const c = bx(0.34 - i * 0.04, 0.025, 0.24 - i * 0.03, cloth[i], 0, i * 0.025, 0)
+        c.rotation.y = i * 0.5
+        g.add(c)
+      }
+      const brass = M(PAL.brass)
+      const arc = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.012, 24, 1, false, 0, Math.PI), brass)
+      arc.position.set(0, 0.085, 0)
+      g.add(arc)
+      g.add(bx(0.27, 0.014, 0.012, M('#7a5a2a'), 0, 0.085, 0))
+      return g
+    }),
 })

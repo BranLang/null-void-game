@@ -1,3 +1,4 @@
+import type { PlateDef } from '../engine/plate/plateMath'
 /**
  * Content authoring types. Chapters, scenes, maps, actors and scripts are
  * plain TypeScript data built from these interfaces. See docs/CONTENT_GUIDE.md.
@@ -321,6 +322,8 @@ export interface SceneDef {
   /** Stealth: what happens when the player is caught (default: retry from checkpoint) */
   stealth?: { failText?: L; onCaught?: Script }
   camera?: { zoom?: number; viewHeight?: number }
+  /** Painted scene plate: the image is the scene, the map is an invisible walk grid (see engine/plate/plateMath.ts) */
+  plate?: PlateDef
   /** Runs on every scene load (also after loading a save). Guard one-time content with g.once(). */
   onEnter?: Script
   /** Called every frame while the scene is active and no script blocks the game */
@@ -345,6 +348,8 @@ export interface ChapterDef {
   flags?: Record<string, boolean | number | string>
   /** Codex entries introduced by this chapter (merged into the game's codex) */
   codex?: CodexEntry[]
+  /** Not part of the story (dev showcase scenes); its scenes still load with ?scene= */
+  hidden?: boolean
 }
 
 export interface CodexEntry {

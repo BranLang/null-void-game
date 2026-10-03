@@ -170,6 +170,10 @@ function runHold(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
     canvas.style.touchAction = 'none'
     card.body.appendChild(canvas)
     ctx.root.style.cursor = 'pointer'
+    // the whole screen is the touch target: no scrolling, selection or long-press callouts
+    ctx.root.style.touchAction = 'none'
+    ctx.root.style.userSelect = 'none'
+    ctx.root.style.setProperty('-webkit-touch-callout', 'none')
     const fit = makeFitter(canvas, card.card, W, H)
 
     // fragments, laid out per character so they can come apart letter by letter

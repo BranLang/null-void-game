@@ -94,7 +94,7 @@ const S = {
   page: { sk: 'Matkin zápisník', en: "Mother's notebook" },
   missteps: { sk: 'Omyly', en: 'Missteps' },
   wrong: { sk: 'Slová nespievajú. Rytmus sa láme.', en: 'The words do not sing. The rhythm breaks.' },
-  speak: { sk: 'Vyslov ju nahlas…', en: 'Speak it aloud…' },
+  speak: { sk: 'Vyslov ho nahlas…', en: 'Speak it aloud…' },
   cutting: { sk: 'Glyf sa vrezáva do dlane…', en: 'The glyph cuts into your palm…' },
   remember: { sk: 'Telo si pamätá.', en: 'The body remembers.' },
   failed: { sk: 'Haiku sa ti rozsypalo na jazyku.', en: 'The haiku crumbles on your tongue.' },

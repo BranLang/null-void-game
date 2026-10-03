@@ -628,7 +628,7 @@ const MAPS: Record<MapId, NavMapDef> = {
       { id: 'aurora', x: 322, y: 258, name: { sk: 'Pod polárnou žiarou', en: 'Under the Aurora' }, flavor: { sk: 'Nad nimi tancuje polárna žiara, zelená a fialová.', en: 'Above them the aurora dances, green and violet.' } },
       { id: 'fangs', x: 180, y: 208, name: { sk: 'Ľadové tesáky', en: 'Ice Fangs' }, flavor: { sk: 'Ľadové tesáky trčia z bieleho poľa ako zuby.', en: 'Ice fangs jut from the white field like teeth.' } },
       { id: 'bone', x: 466, y: 206, name: { sk: 'Kostený hrebeň', en: 'Bone Ridge' }, bones: true, flavor: { sk: 'Hrebeň z kostí obrovského tvora.', en: 'A ridge made of the bones of an enormous creature.' } },
-      { id: 'glacier', x: 320, y: 160, name: { sk: 'Ľadovec', en: 'The Glacier' }, flavor: { sk: 'Ľadovec praská pod Saiinou váhou ako starý dom.', en: "The glacier creaks under Sai's weight like an old house." } },
+      { id: 'glacier', x: 320, y: 160, name: { sk: 'Ľadovec', en: 'The Glacier' }, flavor: { sk: 'Ľadovec praská pod Saiovou váhou ako starý dom.', en: "The glacier creaks under Sai's weight like an old house." } },
       { id: 'pass', x: 198, y: 112, name: { sk: 'Sivý priesmyk', en: 'Grey Pass' }, flavor: { sk: 'V sivom priesmyku kvíli vietor ako dieťa.', en: 'In the grey pass the wind wails like a child.' } },
       { id: 'geysers', x: 450, y: 110, name: { sk: 'Gejzíry', en: 'The Geysers' }, flavor: { sk: 'Gejzíry vystreľujú paru vysoko do studeného vzduchu.', en: 'Geysers shoot steam high into the cold air.' } },
       { id: 'pit', x: 300, y: 70, name: { sk: 'Jama', en: 'The Pit' }, lx: -18, ly: 4, la: 'right', flavor: { sk: 'Jama. Zem sa tu prepadá do tmy, ktorej nevidno dno.', en: 'The Pit. The ground falls away into a darkness with no visible bottom.' } },
@@ -912,26 +912,32 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
     return c < 1e-9 ? 0 : P - c
   }
 
-  /** best possible arrival time (ignoring events), for scoring */
+  /** best possible arrival time (ignoring events), for scoring: Dijkstra with an integer bucket queue */
   function optimalHours(): number {
-    const best = new Map<string, number>()
-    const queue: { n: string; t: number; c: number }[] = [{ n: def.start, t: 0, c: START_CRYSTALS }]
-    while (queue.length) {
-      let bi = 0
-      for (let i = 1; i < queue.length; i++) if (queue[i].t < queue[bi].t) bi = i
-      const s = queue.splice(bi, 1)[0]
-      if (s.n === def.end) return s.t
-      const key = `${s.n}|${s.t}|${s.c}`
-      if (best.has(key) || s.t > BUDGET * 2) continue
-      best.set(key, s.t)
-      for (const leg of def.legs) {
-        if (leg.a !== s.n && leg.b !== s.n) continue
-        const to = leg.a === s.n ? leg.b : leg.a
-        const d = legHours(leg, s.n)
-        const k = heavyCount(s.t, d)
-        if (k <= s.c) queue.push({ n: to, t: s.t + d, c: s.c - k })
-        const w = waitToLight(s.t)
-        if (w > 0 && heavyCount(s.t + w, d) === 0) queue.push({ n: to, t: s.t + w + d, c: s.c })
+    const limit = BUDGET * 2
+    const buckets: { n: string; c: number }[][] = []
+    const seen = new Set<string>()
+    const push = (n: string, t: number, c: number) => {
+      if (t <= limit) (buckets[t] ??= []).push({ n, c })
+    }
+    push(def.start, 0, START_CRYSTALS)
+    for (let t = 0; t <= limit; t++) {
+      const list = buckets[t]
+      if (!list) continue
+      for (const s of list) {
+        if (s.n === def.end) return t
+        const key = `${s.n}|${t}|${s.c}`
+        if (seen.has(key)) continue
+        seen.add(key)
+        for (const leg of def.legs) {
+          if (leg.a !== s.n && leg.b !== s.n) continue
+          const to = leg.a === s.n ? leg.b : leg.a
+          const d = legHours(leg, s.n)
+          const k = heavyCount(t, d)
+          if (k <= s.c) push(to, t + d, s.c - k)
+          const w = waitToLight(t)
+          if (w > 0 && heavyCount(t + w, d) === 0) push(to, t + w + d, s.c)
+        }
       }
     }
     return BUDGET
@@ -1005,8 +1011,15 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
     const legBox = el('div', 'nvnav-box nvnav-leg')
     side.appendChild(legBox)
     const waits = el('div', 'nvnav-waits')
-    const wait1Btn = button(`${ctx.t(S.wait1)} (W)`, () => doWait(1))
-    const waitLBtn = button('', () => doWait(waitToLight(time)))
+    // blur after a click so Enter keeps meaning "fly"
+    const wait1Btn = button(`${ctx.t(S.wait1)} (W)`, () => {
+      wait1Btn.blur()
+      doWait(1)
+    })
+    const waitLBtn = button('', () => {
+      waitLBtn.blur()
+      doWait(waitToLight(time))
+    })
     waits.append(wait1Btn, waitLBtn)
     side.appendChild(waits)
     const logBox = el('div', 'nvnav-log')
