@@ -122,6 +122,8 @@ export interface GameAPI {
   cell(ref: CellRef): Vec2
 
   // ---------------------------------------------------------------- props
+  /** Painted-plate scenes: fade a named overlay region (PlateDef.regions) to an opacity. */
+  plateRegion(id: string, opacity: number, ms?: number): void
   propVisible(id: string, visible: boolean): void
   /** Toggle walkability of a cell (doors, bridges, collapsed rubble). */
   setWalkable(at: CellRef, walkable: boolean): void

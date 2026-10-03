@@ -313,6 +313,9 @@ export class Director {
         return resolveCell(ref)
       },
       // ---------------------------------------------------------- props
+      plateRegion(id, opacity, ms = 0) {
+        if (live()) game.world?.plate?.setRegion(id, opacity, ms)
+      },
       propVisible(id, visible) {
         if (live()) game.world?.setPropVisible(id, visible)
       },

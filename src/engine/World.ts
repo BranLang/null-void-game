@@ -417,6 +417,7 @@ export class World {
     const cam = this.rig.camera
     setParticlePixelScale(this.renderer.renderer.getPixelRatio() * (window.innerHeight / (cam.top - cam.bottom)))
     this.particles.update(dt)
+    this.plate?.update(dt)
     updateLiquids(this.time)
     this.sky.update(this.time, window.innerWidth / Math.max(1, window.innerHeight))
     for (const a of this.animated) if (a.obj.visible) a.fn(a.obj, this.time, dt)

@@ -93,6 +93,7 @@ export class PlateLayer {
     this.materials.push(bgMat)
     this.geometries.push(bgGeo)
 
+    for (const [id, r] of Object.entries(def.regions ?? {})) this.addRegion(id, r, origin)
     for (const occ of def.occluders ?? []) this.addOccluder(occ.poly, occ.base, texture, origin, color)
     this.group.traverse((o) => o.layers.set(FX_LAYER))
     this.group.name = 'plate'
@@ -168,6 +169,94 @@ export class PlateLayer {
     this.materials.push(mat)
     this.geometries.push(geo)
     this.masks.push(mask)
+  }
+
+  private regions = new Map<string, { mat: THREE.MeshBasicMaterial; from: number; to: number; t: number; dur: number }>()
+
+  private addRegion(id: string, r: { poly: UV[]; color: string; opacity?: number; additive?: boolean }, origin: THREE.Vector3): void {
+    const f = this.frame
+    let u0 = 1
+    let v0 = 1
+    let u1 = 0
+    let v1 = 0
+    for (const [u, v] of r.poly) {
+      u0 = Math.min(u0, u)
+      v0 = Math.min(v0, v)
+      u1 = Math.max(u1, u)
+      v1 = Math.max(v1, v)
+    }
+    // pad so the blurred edge has room
+    const pad = 0.03
+    u0 -= pad
+    v0 -= pad
+    u1 += pad
+    v1 += pad
+    const cw = 256
+    const ch = Math.max(16, Math.round((cw * (v1 - v0) * this.def.aspect) / (u1 - u0)))
+    const canvas = document.createElement('canvas')
+    canvas.width = cw
+    canvas.height = ch
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = '#000'
+    ctx.fillRect(0, 0, cw, ch)
+    ctx.filter = `blur(${Math.round(cw * 0.04)}px)`
+    ctx.fillStyle = '#fff'
+    ctx.beginPath()
+    r.poly.forEach(([u, v], i) => {
+      const x = ((u - u0) / (u1 - u0)) * cw
+      const y = ((v - v0) / (v1 - v0)) * ch
+      if (i === 0) ctx.moveTo(x, y)
+      else ctx.lineTo(x, y)
+    })
+    ctx.closePath()
+    ctx.fill()
+    const mask = new THREE.CanvasTexture(canvas)
+    const geo = new THREE.PlaneGeometry((u1 - u0) * f.W, (v1 - v0) * f.H)
+    const mat = new THREE.MeshBasicMaterial({
+      color: r.color,
+      alphaMap: mask,
+      transparent: true,
+      opacity: r.opacity ?? 0,
+      depthTest: false,
+      depthWrite: false,
+      fog: false,
+      toneMapped: false,
+      blending: r.additive ? THREE.AdditiveBlending : THREE.NormalBlending,
+    })
+    const mesh = new THREE.Mesh(geo, mat)
+    mesh.quaternion.copy(VIEW_QUAT)
+    mesh.position
+      .copy(origin)
+      .addScaledVector(VIEW_RIGHT, ((u0 + u1) / 2 - 0.5) * f.W)
+      .addScaledVector(VIEW_UP, (0.5 - (v0 + v1) / 2) * f.H)
+      .addScaledVector(VIEW_DIR, -59)
+    mesh.renderOrder = -900
+    mesh.layers.set(FX_LAYER)
+    this.group.add(mesh)
+    this.materials.push(mat)
+    this.geometries.push(geo)
+    this.masks.push(mask)
+    this.regions.set(id, { mat, from: mat.opacity, to: mat.opacity, t: 0, dur: 0 })
+  }
+
+  /** Fade a named region to an opacity over ms. */
+  setRegion(id: string, opacity: number, ms = 0): void {
+    const r = this.regions.get(id)
+    if (!r) return console.warn(`[plate] unknown region '${id}'`)
+    r.from = r.mat.opacity
+    r.to = opacity
+    r.t = 0
+    r.dur = ms / 1000
+    if (ms <= 0) r.mat.opacity = opacity
+  }
+
+  update(dt: number): void {
+    for (const r of this.regions.values()) {
+      if (r.mat.opacity === r.to || r.dur <= 0) continue
+      r.t += dt
+      const k = Math.min(1, r.t / r.dur)
+      r.mat.opacity = r.from + (r.to - r.from) * k * k * (3 - 2 * k)
+    }
   }
 
   dispose(): void {

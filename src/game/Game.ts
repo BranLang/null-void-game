@@ -179,6 +179,8 @@ export class Game implements MenuHost {
   async newGame(): Promise<void> {
     this.closeAllMenus()
     this.state.reset()
+    const demo = import.meta.env.VITE_DEMO ? this.sceneIndex.get('demo_garden')?.chapter : undefined
+    if (demo) return this.playChapter(demo)
     if (!this.chapters.length) return
     await this.playChapter(this.chapters[0])
   }

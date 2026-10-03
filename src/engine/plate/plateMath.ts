@@ -40,6 +40,8 @@ export interface PlateDef {
   /** holes cut out of the walkable area */
   block?: UV[][]
   occluders?: PlateOccluder[]
+  /** named colour overlays scripts can fade in and out (g.plateRegion), e.g. a branch going dark */
+  regions?: Record<string, { poly: UV[]; color: string; opacity?: number; additive?: boolean }>
   /** multiplies character sprite colours to sit them into the painting's light */
   tint?: string
   /** brightness of the painting itself (default 1) */
