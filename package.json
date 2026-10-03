@@ -2,7 +2,7 @@
   "name": "null-void-saga",
   "version": "0.2.0",
   "private": true,
-  "description": "Null Void Saga I: Eltária, a single-player narrative adventure based on the novel by Bran Lang",
+  "description": "Null Void Saga I: Elt\u00e1ria, a single-player narrative adventure based on the novel by Bran Lang",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,9 @@
     "smoke": "node scripts/smoke.mjs",
     "desktop": "vite build && electron .",
     "desktop:dev": "NV_DEV_URL=http://localhost:5175 electron .",
-    "desktop:build": "vite build && electron-builder --win --linux"
+    "desktop:build": "vite build && electron-builder --win --linux",
+    "build:demo": "VITE_DEMO=1 vite build",
+    "build:procedural": "VITE_PROCEDURAL=1 VITE_UNLOCK_ALL=1 vite build"
   },
   "dependencies": {
     "@fontsource/cinzel": "^5.1.0",
