@@ -1,0 +1,33 @@
+{
+  "name": "null-void-saga",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Null Void Saga I: Eltária, a single-player narrative adventure based on the novel by Bran Lang",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "test": "vitest run",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "@fontsource/cinzel": "^5.1.0",
+    "@fontsource/eb-garamond": "^5.1.0",
+    "howler": "^2.2.4",
+    "three": "^0.183.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/howler": "^2.2.12",
+    "@types/three": "^0.183.1",
+    "eslint": "^10.12.0",
+    "playwright": "1.56.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}
