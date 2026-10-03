@@ -187,7 +187,8 @@ export class TitleScreen {
 
   private build(layer: Layer): void {
     const root = layer.root
-    const img = h('img', { attrs: { src: 'assets/ui/title_bg.jpg', alt: '', draggable: 'false', decoding: 'async' } })
+    const procedural = !!import.meta.env.VITE_PROCEDURAL
+    const img = procedural ? h('div') : h('img', { attrs: { src: 'assets/ui/title_bg.jpg', alt: '', draggable: 'false', decoding: 'async' } })
     const art = h(
       'div',
       { class: 'nvm-title-art', style: `--ratio:${ART_RATIO}` },
@@ -199,7 +200,9 @@ export class TitleScreen {
     const head = h(
       'header',
       'nvm-title-head',
-      h('div', 'nvm-title-logo-float', h('img', { class: 'nvm-title-logo', attrs: { src: 'assets/ui/logo.png', alt: 'Null Void Saga', draggable: 'false' } })),
+      procedural
+        ? h('div', { class: 'nvm-title-logo-float', style: "font-family:'Cinzel',serif;font-size:clamp(34px,6vw,76px);letter-spacing:0.18em;color:#e8d9b0;text-align:center" }, 'NULL VOID SAGA')
+        : h('div', 'nvm-title-logo-float', h('img', { class: 'nvm-title-logo', attrs: { src: 'assets/ui/logo.png', alt: 'Null Void Saga', draggable: 'false' } })),
       h('div', 'nvm-title-sub', h('span', 'nvm-title-sub-text', 'I · ELTÁRIA')),
     )
     this.menu = h('nav', { class: 'nvm-title-menu', attrs: { 'aria-label': 'Menu' } })
@@ -262,6 +265,14 @@ export class TitleScreen {
     foot.append(
       h('div', { class: 'nvm-lang', attrs: { role: 'group', 'aria-label': t(S.language) } }, mk('sk', 'SK'), h('span', 'nvm-lang-sep'), mk('en', 'EN')),
       h('div', 'nvm-title-credit', t(S.basedOn)),
+      import.meta.env.VITE_PROCEDURAL
+        ? h(
+            'div',
+            { class: 'nvm-title-credit', style: 'display:flex;gap:18px' },
+            h('a', { attrs: { href: 'gallery.html', style: 'color:#d6b26a' }, text: getLang() === 'sk' ? 'Galéria rekvizít' : 'Prop gallery' }),
+            h('a', { attrs: { href: 'characters.html', style: 'color:#d6b26a' }, text: getLang() === 'sk' ? 'Postavy' : 'Characters' }),
+          )
+        : '',
       h('div', 'nvm-title-version', this.host.version),
     )
   }

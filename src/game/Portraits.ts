@@ -21,7 +21,7 @@ export class Portraits {
   get(castId: string, mood: Expression = 'neutral'): string | HTMLCanvasElement | null {
     const cast = CAST[castId]
     if (!cast) return null
-    if (cast.portrait) return `assets/portraits/${cast.portrait}.webp`
+    if (cast.portrait && !import.meta.env.VITE_PROCEDURAL) return `assets/portraits/${cast.portrait}.webp`
     if (cast.special || 'quadruped' in cast.look) return this.renderQuad(castId)
     const key = `${castId}|${mood}`
     const hit = this.cache.get(key)

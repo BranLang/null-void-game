@@ -46,6 +46,7 @@ function loadChapters(): ChapterDef[] {
   return Object.values(mods)
     .map((m) => m.default ?? m.chapter)
     .filter((c): c is ChapterDef => !!c)
+    .filter((c) => !(import.meta.env.VITE_PROCEDURAL && c.hidden))
     .sort((a, b) => a.index - b.index)
 }
 
@@ -114,6 +115,8 @@ export class Game implements MenuHost {
     this.director = new Director(this)
     const all = loadChapters()
     this.chapters = all.filter((c) => !c.hidden)
+    // review build: every chapter (finished or not) is selectable
+    if (import.meta.env.VITE_UNLOCK_ALL) for (const c of this.chapters) if (!this.profile.chapters.includes(c.id)) this.profile.chapters.push(c.id)
     const extra = this.chapters.flatMap((c) => c.codex ?? [])
     this.codexEntries = [...CODEX, ...extra]
     for (const ch of all) for (const sc of ch.scenes) this.sceneIndex.set(sc.id, { chapter: ch, scene: sc })

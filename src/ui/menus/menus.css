@@ -498,12 +498,13 @@
   transition: transform 1.4s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 .nvm-title-art {
-  --w: max(100vw, calc(100vh * var(--ratio)));
-  --h: max(100vh, calc(100vw / var(--ratio)));
+  /* the statue stands at 52.8 % of the painting: centre it on screen (extra width covers the shift) */
+  --w: max(106vw, calc(106vh * var(--ratio)));
+  --h: calc(var(--w) / var(--ratio));
   position: absolute;
   width: var(--w);
   height: var(--h);
-  left: calc(50% - var(--w) / 2);
+  left: calc(50% - var(--w) * 0.528);
   top: calc(50% - var(--h) / 2);
   opacity: 0;
   transition: opacity 1.8s ease;
