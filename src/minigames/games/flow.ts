@@ -4,7 +4,7 @@
  * the glyph (source) into every target.
  *
  * params: { level?: 'tree' | 'lungs' | 'wound' | 'canal' }   (default 'tree')
- * result: { success: true, score: 0..1 (moves compared with the shortest solution) }
+ * result: { success: true, score: 0..1 (moves compared with the shortest solution), data: { moves, par } }
  *         skipped: { success: true, score: 0, data: { skipped: true } }
  *
  * Every layout is stored in its SOLVED orientation and scrambled with a seeded
@@ -1029,7 +1029,7 @@ function runFlow(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
       card.buttons.replaceChildren()
       if (solved) {
         if (doneShown) {
-          const b = button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score }), true)
+          const b = button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score, data: { moves, par } }), true)
           card.buttons.appendChild(b)
         }
         return
@@ -1146,7 +1146,7 @@ function runFlow(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
       if (solved) {
         if (doneShown && !e.repeat && (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE')) {
           e.preventDefault()
-          finish({ success: true, score })
+          finish({ success: true, score, data: { moves, par } })
         }
         return
       }

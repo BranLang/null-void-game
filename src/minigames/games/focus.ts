@@ -13,7 +13,7 @@
  *   stakes?: boolean                 a strain meter fills while holding; frost creeps over the
  *                                    screen edges; strain 100% = failure
  * }
- * result: { success, score: 0..1 }
+ * result: { success, score: 0..1, data: { melts, misfires } }
  */
 import { registerMinigame, createCard, button, hiDpiCanvas, UI_STRINGS, type MinigameContext } from '../Minigame'
 import type { MinigameParams, MinigameResult } from '../../game/GameAPI'
@@ -471,7 +471,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       card.hint.textContent = ctx.t(TEXT.done)
       card.hint.style.color = 'var(--nv-frost)'
       card.buttons.replaceChildren()
-      card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score: Math.round(score * 100) / 100 }), true))
+      card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score: Math.round(score * 100) / 100, data: { melts, misfires } }), true))
       fit(true)
     }
 

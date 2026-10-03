@@ -13,7 +13,7 @@
  *   duration?: number  seconds of holding needed (default 12)
  *   title?: L, subtitle?: L
  * }
- * result: { success: true, score: 1 without releases, lower with each release }
+ * result: { success: true, score: 1 without releases, lower with each release, data: { releases } }
  */
 import { registerMinigame, createCard, button, hiDpiCanvas, UI_STRINGS, type MinigameContext } from '../Minigame'
 import type { MinigameParams, MinigameResult } from '../../game/GameAPI'
@@ -433,7 +433,7 @@ function runHold(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
         doneT += dt
         // everything, the words included, goes into the light
         card.card.style.opacity = String(1 - clamp01((doneT - 0.8) / 1.4))
-        if (doneT > 2.6) finish({ success: true, score: Math.max(0.3, Math.round((1 - releases * 0.15) * 100) / 100) })
+        if (doneT > 2.6) finish({ success: true, score: Math.max(0.3, Math.round((1 - releases * 0.15) * 100) / 100), data: { releases } })
       }
       holdKeys = hold ? Math.min(1, holdKeys + dt * 3) : Math.max(0, holdKeys - dt * 2)
       shown += (progress - shown) * Math.min(1, dt * 4)

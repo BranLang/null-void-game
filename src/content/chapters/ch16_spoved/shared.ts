@@ -91,9 +91,9 @@ Object.assign(CAST, people)
 export const HALL_DAWN: AmbienceDef = {
   sky: { top: '#07090a', bottom: '#101614', stars: 0 },
   fog: { color: '#0c1210', near: 12, far: 40 },
-  hemi: { sky: '#8fb4a6', ground: '#2a2420', intensity: 0.78 },
-  exposure: 1.06,
-  bloom: { strength: 0.95, radius: 0.6, threshold: 0.76 },
+  hemi: { sky: '#a8c8bc', ground: '#4a4036', intensity: 1.25 },
+  exposure: 1.22,
+  bloom: { strength: 0.7, radius: 0.55, threshold: 0.86 },
   grade: { tint: '#e6efe6', saturation: 0.9, contrast: 1.06, vignette: 0.5 },
   particles: [
     { kind: 'dust', count: 110, color: '#c8d8c4' },
@@ -106,7 +106,7 @@ export const HALL_DAWN: AmbienceDef = {
 /** Light hour: children play in the green light; the hull breathes easier. */
 export const HALL_LIGHT: AmbienceDef = {
   ...HALL_DAWN,
-  hemi: { sky: '#a6d8be', ground: '#3a3228', intensity: 0.98 },
+  hemi: { sky: '#bce4cc', ground: '#5a4a3a', intensity: 1.5 },
   grade: { tint: '#eef6ea', saturation: 1, contrast: 1.04, vignette: 0.42 },
 }
 
@@ -114,7 +114,7 @@ export const HALL_LIGHT: AmbienceDef = {
 export const HALL_HEAVY: AmbienceDef = {
   sky: { top: '#040506', bottom: '#0a0c0c', stars: 0 },
   fog: { color: '#070908', near: 8, far: 30 },
-  hemi: { sky: '#4f6a62', ground: '#18140f', intensity: 0.5 },
+  hemi: { sky: '#5f7a72', ground: '#28201a', intensity: 0.8 },
   exposure: 0.98,
   bloom: { strength: 1.05, radius: 0.6, threshold: 0.7 },
   grade: { tint: '#dfe6df', saturation: 0.78, contrast: 1.08, vignette: 0.62 },
@@ -126,7 +126,7 @@ export const HALL_HEAVY: AmbienceDef = {
 /** Evening at the last barrel. Yeast breaks through the oil and the fear. */
 export const HALL_EVENING: AmbienceDef = {
   ...HALL_DAWN,
-  hemi: { sky: '#86a69a', ground: '#3a2a1e', intensity: 0.68 },
+  hemi: { sky: '#a0b4a8', ground: '#5a402a', intensity: 1.1 },
   grade: { tint: '#f4e8d8', saturation: 0.96, contrast: 1.06, vignette: 0.52 },
   sounds: ['crowd', 'hum'],
 }
@@ -135,7 +135,7 @@ export const HALL_EVENING: AmbienceDef = {
 export const WORKSHOP_AMB: AmbienceDef = {
   sky: { top: '#060504', bottom: '#0e0b08', stars: 0 },
   fog: { color: '#0d0a07', near: 10, far: 30 },
-  hemi: { sky: '#b09878', ground: '#2a1e14', intensity: 0.62 },
+  hemi: { sky: '#c8b090', ground: '#4a3424', intensity: 1.05 },
   exposure: 1.05,
   bloom: { strength: 0.9, radius: 0.55, threshold: 0.75 },
   grade: { tint: '#f6e8d4', saturation: 0.92, contrast: 1.07, vignette: 0.55 },
@@ -207,11 +207,11 @@ export const HALL_MAP: MapDef = {
     D: { floor: 'metal', walk: false, tag: 'workdoor' },
     g: { floor: 'metal', tint: '#7a8088', tag: 'gate_in' },
     d: { floor: 'metal', tint: '#7a8088', tag: 'work_in' },
-    '.': { floor: 'metal', tint: '#9aa0a8' },
+    '.': { floor: 'metal', tint: '#b8bec6' },
     ',': { floor: 'metal', tint: '#747a82' },
-    _: { floor: 'tile', tint: '#6e747c' },
-    w: { floor: 'wood', tint: '#8a7258' },
-    p: { floor: 'moss', tint: '#5a8a6a', prop: { type: 'mushroom', color: '#6dffb8', scale: 1.2 } },
+    _: { floor: 'tile', tint: '#8e949c' },
+    w: { floor: 'wood', tint: '#b08e6a' },
+    p: { floor: 'moss', tint: '#5a8a6a', prop: { type: 'mushroom', color: '#4fd89a', scale: 0.8 } },
   },
 }
 

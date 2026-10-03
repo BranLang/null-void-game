@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import type { ActorDef, ChapterDef, CodexEntry, InteractableDef, SceneDef, Vec2 } from '../content/types'
 import { CAST } from '../content/characters'
-import { CODEX } from '../content/codex'
+import { CODEX, resolveCodexId } from '../content/codex'
 import { Renderer } from '../engine/Renderer'
 import { CameraRig } from '../engine/CameraRig'
 import { Input } from '../engine/Input'
@@ -28,7 +28,7 @@ import { SaveLoadMenu } from '../ui/menus/SaveLoadMenu'
 import { CodexScreen } from '../ui/menus/CodexScreen'
 import { CreditsScreen } from '../ui/menus/CreditsScreen'
 import { ChapterSelect } from '../ui/menus/ChapterSelect'
-import { openReader } from '../ui/menus/Reader'
+import { openReader, anyLayerOpen, syncRootSettings } from '../ui/menus/Reader'
 import { UI } from './strings'
 
 export const VERSION = 'v0.2.0'
@@ -139,7 +139,7 @@ export class Game implements MenuHost {
     this.audio.setVolumes(next.music, next.sfx, next.ambience)
     this.renderer.setQuality(next.quality)
     this.renderer.setOutlines(next.outlines)
-    document.documentElement.style.setProperty('--nv-text-scale', String(next.textScale))
+    syncRootSettings(next)
     this.ui.setLabels(t(UI.objective), t(UI.veil), t(UI.strain))
     if (this.state.objective) this.ui.setObjective(t(this.state.objective), false)
     this.refreshAbilities()
@@ -538,7 +538,8 @@ export class Game implements MenuHost {
     }
   }
 
-  unlockCodex(id: string): void {
+  unlockCodex(rawId: string): void {
+    const id = resolveCodexId(rawId)
     if (this.state.codex.has(id)) return
     this.state.codex.add(id)
     if (!this.profile.codex.includes(id)) {
@@ -656,7 +657,7 @@ export class Game implements MenuHost {
     const p = this.player
     const w = this.world
     if (!p || !w) return
-    const controllable = !this.director.locked && !this.dialogueBusy && !this.minigameActive && !this.paused && this.spira.collapse <= 0
+    const controllable = !this.director.locked && !this.dialogueBusy && !this.minigameActive && !this.paused && !anyLayerOpen() && this.spira.collapse <= 0
     let speedNow = 0
     if (controllable) {
       const mv = this.input.moveVector()

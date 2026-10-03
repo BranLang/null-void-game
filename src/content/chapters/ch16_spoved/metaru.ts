@@ -106,7 +106,7 @@ const clutter: PlacedProp[] = [
   { type: 'ch16_cup', at: [26, 17], y: 0.74, offset: [0.15, 0.1] },
   { type: 'candles', at: [27, 18] },
   // glowing plants at the hull base
-  { type: 'mushroom', at: [5, 3], color: '#6dffb8', params: { glow: true } },
+  
   { type: 'flowers', at: [12, 1], params: { glow: true } },
   { type: 'flowers', at: [1, 10], params: { glow: true } },
   { type: 'mushroom', at: [20, 1], color: '#7dffc8' },

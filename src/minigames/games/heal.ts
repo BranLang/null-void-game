@@ -12,7 +12,7 @@
  *   title?: L, subtitle?: L
  *   target?: 'baby' | 'hands'   (default 'baby'; 'hands' = warming frozen hands)
  * }
- * result: { success, score: 0..1 (fuel left, torn streams) }
+ * result: { success, score: 0..1 (fuel left, torn streams), data: { breaks, fuelLeft } }
  */
 import { registerMinigame, createCard, button, hiDpiCanvas, UI_STRINGS, type MinigameContext } from '../Minigame'
 import type { MinigameParams, MinigameResult } from '../../game/GameAPI'
@@ -254,7 +254,7 @@ function runHeal(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
       card.hint.style.color = 'var(--nv-gold-bright)'
       card.buttons.replaceChildren()
       const score = Math.round(clamp01(1 - breaks * 0.15) * (0.6 + 0.4 * Math.min(1, fuel / 0.3)) * 100) / 100
-      card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score }), true))
+      card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score, data: { breaks, fuelLeft: Math.round(fuel * 100) / 100 } }), true))
       fit(true)
     }
 

@@ -13,7 +13,7 @@
  *   title?: L, subtitle?: L
  *   color?: string       glow colour of the signs (hex, default warm copper)
  * }
- * result: { success, score: hits / (hits + misses) }
+ * result: { success, score: hits / (hits + misses), data: { hits, misses } }
  */
 import { registerMinigame, createCard, button, hiDpiCanvas, UI_STRINGS, type MinigameContext } from '../Minigame'
 import type { MinigameParams, MinigameResult } from '../../game/GameAPI'
@@ -260,7 +260,7 @@ function runInputs(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
       card.hint.style.color = 'var(--nv-gold-bright)'
       card.buttons.replaceChildren()
       const score = Math.round((hits / (hits + missCount)) * 100) / 100
-      card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score }), true))
+      card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score, data: { hits, misses: missCount } }), true))
       fit(true)
     }
 

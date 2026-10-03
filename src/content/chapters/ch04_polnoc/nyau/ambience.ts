@@ -25,16 +25,16 @@ export const dockDay: AmbienceDef = {
 
 /** Morning on the aerodock, the sea fog still lying on the far water. */
 export const dockFog: AmbienceDef = {
-  sky: { top: '#8e9cb4', bottom: '#e4dccd', stars: 0, clouds: 0.4 },
-  fog: { color: '#c9ccd2', near: 3, far: 30 },
-  hemi: { sky: '#c8d2e6', ground: '#5e5448', intensity: 1.15 },
-  sun: { color: '#ffd9ae', intensity: 1.35, dir: [0.65, 0.55, 0.3], shadows: true },
-  exposure: 1.02,
-  bloom: { strength: 0.6, radius: 0.55, threshold: 0.84 },
-  grade: { tint: '#f2eee8', saturation: 0.86, contrast: 1.02, vignette: 0.3 },
+  sky: { top: '#9aaac4', bottom: '#f0e6d6', stars: 0, clouds: 0.4 },
+  fog: { color: '#d6d8dc', near: 6, far: 40 },
+  hemi: { sky: '#dce4f4', ground: '#7a6c5c', intensity: 1.55 },
+  sun: { color: '#ffe2bc', intensity: 1.9, dir: [0.55, 0.75, 0.3], shadows: true },
+  exposure: 1.12,
+  bloom: { strength: 0.55, radius: 0.55, threshold: 0.86 },
+  grade: { tint: '#f6f4f0', saturation: 0.92, contrast: 1.02, vignette: 0.26 },
   particles: [
-    { kind: 'steam', count: 70, color: '#eef0f4', area: [6, 0, 33, 7] },
-    { kind: 'dust', count: 70, color: '#ddd4c4' },
+    { kind: 'steam', count: 26, color: '#dfe3ea', area: [6, 0, 33, 7] },
+    { kind: 'dust', count: 70, color: '#e6dccc' },
   ],
   music: null,
   sounds: ['sea', 'wind', 'crowd'],
