@@ -513,12 +513,13 @@ function pageTex(): THREE.CanvasTexture {
 /** The original Book of El lying open between its two obsidian tablets; the veins breathe violet. */
 registerProp('c5_book_open', {
   solid: false,
-  light: { color: '#9a6bff', intensity: 1.2, distance: 3.2, y: 0.4 },
+  light: (ctx) => (bool(ctx, 'white') ? null : { color: '#9a6bff', intensity: 1.2, distance: 3.2, y: 0.4 }),
   build: (ctx) => {
     const g = new THREE.Group()
     const closed = bool(ctx, 'closed')
-    const black = M('#100c16')
-    const veins = uniqueGlow('#b07aff', 2.2, 0.9)
+    const white = bool(ctx, 'white')
+    const black = white ? M('#f2ecdc') : M('#100c16')
+    const veins = white ? uniqueGlow('#e8c060', 1.1, 0.8) : uniqueGlow('#b07aff', 2.2, 0.9)
     veins.map = veinTex()
     veins.blending = THREE.AdditiveBlending
     veins.transparent = true
@@ -552,20 +553,23 @@ registerProp('c5_book_open', {
         book.add(half)
       }
       // a faint violet light rising from the gutter
-      const halo = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), additive('#9a60ff', 0.6, 0.35))
-      halo.rotation.x = -Math.PI / 2
-      halo.position.y = 0.09
-      book.add(fx(keep(halo)))
+      if (!white) {
+        const halo = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.9), additive('#9a60ff', 0.6, 0.35))
+        halo.rotation.x = -Math.PI / 2
+        halo.position.y = 0.09
+        book.add(fx(keep(halo)))
+      }
     }
     book.position.y = num(ctx, 'y', 0)
     book.rotation.y = (ctx.rand() - 0.5) * 0.2
     g.add(book)
     g.userData.veins = veins
+    g.userData.white = white
     return finalize(g)
   },
   animate: (obj, t) => {
     const m = obj.userData.veins as THREE.MeshBasicMaterial | undefined
-    if (m) m.color.copy(m.userData.base as THREE.Color).multiplyScalar(0.55 + 0.45 * Math.sin(t * 1.1))
+    if (m && !obj.userData.white) m.color.copy(m.userData.base as THREE.Color).multiplyScalar(0.55 + 0.45 * Math.sin(t * 1.1))
   },
 })
 

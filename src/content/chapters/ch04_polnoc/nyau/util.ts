@@ -3,31 +3,8 @@
  */
 import type { Vec2 } from '../../../types'
 import type { GameAPI } from '../../../../game/GameAPI'
-
-/**
- * A companion that walks a few steps behind the player (call from onUpdate).
- * It follows the player's trail so it never steps onto the player's cell.
- */
-export function follower(id: string, opts: { gap?: number; interval?: number } = {}): (g: GameAPI, dt: number) => void {
-  const trail: Vec2[] = []
-  let timer = 0
-  const gap = opts.gap ?? 1.6
-  return (g, dt) => {
-    const p = g.pos('player')
-    const last = trail[trail.length - 1]
-    if (!last || last[0] !== p[0] || last[1] !== p[1]) {
-      trail.push(p)
-      if (trail.length > 10) trail.shift()
-    }
-    timer -= dt
-    if (timer > 0) return
-    timer = opts.interval ?? 0.3
-    const d = g.dist(id, 'player')
-    if (d <= gap) return
-    const target = trail.length >= 2 ? trail[trail.length - 2] : p
-    void g.walk(id, target, { speed: d > 3.2 ? 4.4 : 3.0 })
-  }
-}
+import type { L } from '../../../../i18n/i18n'
+import type { Expression } from '../../../../engine/characters/Face'
 
 /** True when `who` stands within `r` tiles of any of the cells. */
 export function nearAny(g: GameAPI, who: string, cells: readonly Vec2[], r: number): boolean {
@@ -36,7 +13,22 @@ export function nearAny(g: GameAPI, who: string, cells: readonly Vec2[], r: numb
   return false
 }
 
-/** A guard that cannot see you in the dark unless you come close (or `lit` is set). */
+/**
+ * Night sight for temple watchers: two glowing robes in the dark pass for
+ * sisters at prayer, so a watcher only notices you up close, unless the
+ * flag `litFlag` is set (lichen lighting up Arkot's spots).
+ */
 export function darkSight(guardId: string, litFlag: string, close = 2.2): (g: GameAPI) => boolean {
   return (g) => !g.flag(litFlag) && g.dist(guardId, 'player') > close
+}
+
+/** A dialogue line: speaker (actor/cast id, or null for narration), text, optional mood. */
+export type Line = [string | null, L, Expression?]
+
+/** Play dialogue lines back to back. */
+export async function lines(g: GameAPI, list: Line[]): Promise<void> {
+  for (const [who, text, mood] of list) {
+    if (who === null) await g.narrate(text)
+    else await g.say(who, text, mood ? { mood } : undefined)
+  }
 }

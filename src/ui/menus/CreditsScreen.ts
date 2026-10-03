@@ -183,6 +183,8 @@ export class CreditsScreen {
   }
 
   private onKey(e: KeyboardEvent): boolean {
+    // leave browser / system keys alone
+    if (e.ctrlKey || e.metaKey || e.altKey || /^F\d+$/.test(e.key) || ['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return false
     if (this.ending) {
       if (!e.repeat) this.skip(false)
       return true

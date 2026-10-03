@@ -108,6 +108,8 @@ class DustField {
     if (!ctx) return
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0)
     ctx.clearRect(0, 0, this.w, this.hgt)
+    // the setting can change while the title is open
+    if (reducedMotion()) return
     ctx.globalCompositeOperation = 'lighter'
     for (let i = 0; i < this.motes.length; i++) {
       const m = this.motes[i]
@@ -205,12 +207,10 @@ export class TitleScreen {
     root.append(stage, head, this.menu, this.foot)
     this.renderMenu()
     this.renderFoot()
-    if (!reducedMotion()) {
-      this.dust = new DustField(canvas)
-      // start after layout so the canvas has a size
-      requestAnimationFrame(() => this.dust?.start())
-      root.addEventListener('mousemove', this.onMove)
-    }
+    this.dust = new DustField(canvas)
+    // start after layout so the canvas has a size
+    requestAnimationFrame(() => this.dust?.start())
+    root.addEventListener('mousemove', this.onMove)
   }
 
   private items(): { id: ItemId; label: string; sub?: string }[] {

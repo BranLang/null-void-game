@@ -733,3 +733,24 @@ registerProp('c1_lockgate', {
     })
   },
 })
+
+// ------------------------------------------------------------------ the scale-woman's cargo ledger on a small crate
+registerProp('c1_ledger', {
+  solid: true,
+  build: () =>
+    cachedBuild('c1-ledger', () => {
+      const g = new THREE.Group()
+      g.add(bx(0.62, 0.46, 0.5, M('#b07a48'), 0, 0, 0))
+      g.add(bx(0.64, 0.04, 0.52, M(PAL.woodDark), 0, 0.46, 0))
+      const book = new THREE.Group()
+      book.add(bx(0.36, 0.09, 0.27, M('#5a2a24'), 0, 0, 0))
+      book.add(bx(0.34, 0.075, 0.25, M(PAL.paper), 0.01, 0.007, 0))
+      book.add(bx(0.03, 0.095, 0.27, M('#3a1a16'), -0.17, 0, 0))
+      book.position.set(-0.04, 0.5, 0.02)
+      book.rotation.y = 0.25
+      g.add(book)
+      g.add(rod([0.16, 0.52, -0.1], [0.24, 0.52, 0.1], 0.008, 0.008, M('#2a2a2a'), 4))
+      g.add(rot(torus(0.07, 0.015, M(PAL.rope), 0.2, 0.5, -0.16, 4, 10), Math.PI / 2, 0, 0))
+      return g
+    }),
+})

@@ -716,10 +716,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55vh;
+  gap: 0.15vh;
   transition:
     opacity 0.6s ease,
     transform 0.6s var(--nvm-ease);
+}
+.nvm-title-menu::before {
+  content: '';
+  position: absolute;
+  inset: -6vh -14vw -3vh;
+  z-index: -1;
+  background: radial-gradient(ellipse 50% 50% at 50% 52%, rgba(4, 3, 10, 0.5), rgba(4, 3, 10, 0.18) 60%, transparent 78%);
+  pointer-events: none;
 }
 .nvm-tbtn {
   position: relative;
@@ -727,7 +735,7 @@
   flex-direction: column;
   align-items: center;
   min-width: 380px;
-  padding: 1.05vh 60px 1.15vh;
+  padding: 0.75vh 60px 0.85vh;
   color: rgba(236, 228, 212, 0.84);
   font-family: var(--nv-font-title);
   font-size: calc(clamp(16px, 1.3vw, 21px) * var(--nv-text-scale));
@@ -1057,7 +1065,6 @@
   gap: 12px;
   padding: 34px 36px 30px;
   min-width: 0;
-  overflow-y: auto;
 }
 .nvm-pause-chapter {
   font-family: var(--nv-font-title);
@@ -2326,6 +2333,9 @@
   border: 1px dashed rgba(214, 178, 106, 0.3);
   pointer-events: none;
 }
+.nvm-page--month .nvm-page-body p {
+  text-align: center;
+}
 .nvm-dropcap::first-letter {
   float: left;
   margin: 0.06em 0.12em 0 0;
@@ -2435,7 +2445,7 @@
   stroke-width: 0.6;
 }
 .nvm-wm-num {
-  font-size: 8.5px;
+  font-size: 10px;
   letter-spacing: 1.4px;
   fill: #e3a06e;
   text-anchor: middle;
@@ -2487,7 +2497,7 @@
   stroke-width: 0.9;
 }
 .nvm-wheel-big {
-  font-size: 19px;
+  font-size: 21px;
   letter-spacing: 2px;
   fill: #f3e7cc;
   text-anchor: middle;
@@ -2495,7 +2505,7 @@
 .nvm-wheel-small {
   font-family: var(--nv-font-body);
   font-style: italic;
-  font-size: 13px;
+  font-size: 14.5px;
   fill: rgba(233, 220, 192, 0.7);
   text-anchor: middle;
 }

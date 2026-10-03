@@ -414,6 +414,7 @@ export class CodexScreen {
     page.textContent = ''
     page.scrollTop = 0
     const sec = codexSection(id)
+    page.classList.toggle('nvm-page--month', sec?.key === 'months')
     const tabLabel = TABS.find((x) => x.id === this.tab)?.label
     const kicker = [tabLabel ? t(tabLabel) : '', sec ? t(sec.title) : ''].filter(Boolean).join(' · ')
     const body = h('div', 'nvm-page-body')

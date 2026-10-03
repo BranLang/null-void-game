@@ -117,8 +117,9 @@ const S = {
   flyBurn: { sk: 'Leť a spáľ {k} {kw}', en: 'Fly, burn {k} {kw}' },
   fireRisk: { sk: 'riziko požiaru!', en: 'fire risk!' },
   waitFly: { sk: 'Počkaj {h} h a leť', en: 'Wait {h} h, then fly' },
-  wait1: { sk: 'Počkať 1 h', en: 'Wait 1 h' },
-  waitLight: { sk: 'Do ľahkej hodiny (+{h} h)', en: 'Until the light hour (+{h} h)' },
+  wait1: { sk: 'Čakať 1 h', en: 'Wait 1 h' },
+  waitLight: { sk: 'Do ľahkej +{h} h', en: 'To light +{h} h' },
+  waitLight0: { sk: 'Do ľahkej', en: 'To light' },
   burned: { sk: 'Kryštál vzplanul v kotle. Itaka drží výšku.', en: 'A crystal flares in the boiler. The Itaka holds her height.' },
   waited: { sk: 'Itaka čaká na zemi (+{h} h).', en: 'The Itaka waits on the ground (+{h} h).' },
   landed: { sk: 'Pristátie: {place}.', en: 'Landed: {place}.' },
@@ -420,9 +421,9 @@ function terrainEast(g: CanvasRenderingContext2D, rnd: () => number): void {
   }
   // white pillars
   for (let k = 0; k < 6; k++) {
-    const x = 560 + k * 9 + (k % 2) * 3
-    const h = 26 + (k % 3) * 9
-    const y = 222 - h + (k % 2) * 6
+    const x = 566 + k * 9 + (k % 2) * 3
+    const h = 24 + (k % 3) * 9
+    const y = 318 - h + (k % 2) * 6
     g.fillStyle = 'rgba(250,246,236,0.95)'
     g.strokeStyle = 'rgba(59,38,18,0.7)'
     g.lineWidth = 1
@@ -664,18 +665,19 @@ const MAPS: Record<MapId, NavMapDef> = {
 }
 
 const CSS = `
-.nvnav{display:flex;gap:14px;align-items:stretch;justify-content:center;flex-wrap:wrap}
+.nvnav{display:flex;gap:14px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
 .nvnav-map{position:relative;border-radius:8px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.5)}
-.nvnav-side{width:226px;display:flex;flex-direction:column;gap:9px;font-family:var(--nv-font-body);color:var(--nv-text)}
-.nvnav-box{background:rgba(255,255,255,.03);border:1px solid var(--nv-line);border-radius:8px;padding:8px 10px}
+.nvnav-side{width:226px;display:flex;flex-direction:column;gap:8px;font-family:var(--nv-font-body);color:var(--nv-text)}
+.nvnav-box{background:rgba(255,255,255,.03);border:1px solid var(--nv-line);border-radius:8px;padding:7px 10px}
+.nvnav-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .nvnav-lab{font-family:var(--nv-font-title);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--nv-gold)}
-.nvnav-val{font-size:calc(16px * var(--nv-text-scale))}
-.nvnav-bar{height:7px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:5px}
+.nvnav-val{font-size:calc(15px * var(--nv-text-scale))}
+.nvnav-bar{height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin:3px 0 6px}
 .nvnav-bar>div{height:100%;background:linear-gradient(90deg,#b98b3e,#f3d995);transition:width .3s}
-.nvnav-cr{display:flex;gap:5px;align-items:center;min-height:20px;margin-top:3px}
+.nvnav-cr{display:flex;gap:5px;align-items:center;min-height:18px}
 .nvnav-gem{width:11px;height:17px;clip-path:polygon(50% 0,100% 30%,80% 100%,20% 100%,0 30%);background:linear-gradient(180deg,#f0deff,#9257ff 55%,#3d1474);box-shadow:0 0 10px #b77dff;filter:drop-shadow(0 0 4px #b77dff)}
 .nvnav-gem.out{background:rgba(255,255,255,.12);box-shadow:none;filter:none}
-.nvnav-leg{min-height:118px;display:flex;flex-direction:column;gap:6px}
+.nvnav-leg{min-height:112px;display:flex;flex-direction:column;gap:5px}
 .nvnav-leg .nvnav-to{font-family:var(--nv-font-title);color:var(--nv-gold-bright);font-size:13px;letter-spacing:.06em}
 .nvnav-leg .nvnav-note{font-size:14px;line-height:1.25;color:var(--nv-text-dim)}
 .nvnav-leg .nvnav-warn{color:#ff9aa4}
@@ -683,8 +685,8 @@ const CSS = `
 .nvnav-leg .nvnav-windc{color:#7fe8f0}
 .nvnav-side .nv-btn{padding:7px 10px;font-size:12px;letter-spacing:.06em;text-align:left}
 .nvnav-waits{display:flex;gap:6px}
-.nvnav-waits .nv-btn{flex:1;text-align:center;padding:6px 4px;font-size:11px}
-.nvnav-log{font-size:13.5px;font-style:italic;color:var(--nv-text-dim);line-height:1.3;min-height:52px}
+.nvnav-waits .nv-btn{flex:1;text-align:center;padding:6px 4px;font-size:11px;white-space:nowrap}
+.nvnav-log{font-size:13px;font-style:italic;color:var(--nv-text-dim);line-height:1.28;height:52px;overflow:hidden}
 .nvnav-log div:first-child{color:var(--nv-text)}
 .nvnav-ev{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,6,3,.42);backdrop-filter:blur(1.5px)}
 .nvnav-evc{width:min(380px,86%);padding:16px 18px;display:flex;flex-direction:column;gap:10px;animation:nv-fade-in .3s}
@@ -968,27 +970,31 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
     // sai clock
     const saiBox = el('div', 'nvnav-box')
     saiBox.style.cssText += 'display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px'
-    const SC = 132
+    const SC = 112
     const { canvas: saiCanvas, ctx: sg } = hiDpiCanvas(SC, SC)
     saiBox.appendChild(saiCanvas)
     const saiLab = el('div', 'nvnav-lab', ctx.t(S.sai))
+    saiLab.title = ctx.t(S.cycle, { p: P, h: HV })
     const saiSub = el('div', '', ctx.t(S.cycle, { p: P, h: HV }))
-    saiSub.style.cssText = 'font-size:12px;color:var(--nv-text-dim);font-style:italic'
+    saiSub.style.cssText = 'font-size:11.5px;color:var(--nv-text-dim);font-style:italic;line-height:1'
     saiBox.append(saiLab, saiSub)
     side.appendChild(saiBox)
     // stats
     const stats = el('div', 'nvnav-box')
     const timeVal = el('div', 'nvnav-val')
+    timeVal.style.marginBottom = '4px'
+    const supRow = el('div', 'nvnav-row')
     const supLab = el('div', 'nvnav-lab', ctx.t(S.supplies))
-    supLab.style.marginTop = '6px'
     const supVal = el('div', 'nvnav-val')
+    supRow.append(supLab, supVal)
     const bar = el('div', 'nvnav-bar')
     const barFill = el('div')
     bar.appendChild(barFill)
+    const crRowWrap = el('div', 'nvnav-row')
     const crLab = el('div', 'nvnav-lab', ctx.t(S.crystals))
-    crLab.style.marginTop = '6px'
     const crRow = el('div', 'nvnav-cr')
-    stats.append(timeVal, supLab, supVal, bar, crLab, crRow)
+    crRowWrap.append(crLab, crRow)
+    stats.append(timeVal, supRow, bar, crRowWrap)
     side.appendChild(stats)
     // leg info
     const legBox = el('div', 'nvnav-box nvnav-leg')
@@ -1032,7 +1038,7 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
     const sparks: Spark[] = []
 
     function addLog(s: string): void {
-      log = [s, ...log].slice(0, 3)
+      log = [s, ...log].slice(0, 2)
       logBox.replaceChildren(...log.map((l) => el('div', '', l)))
     }
 
@@ -1083,7 +1089,7 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
       const busy = mode !== 'idle'
       wait1Btn.disabled = busy
       const wl = waitToLight(time)
-      waitLBtn.textContent = `${ctx.t(S.waitLight, { h: wl })} (L)`
+      waitLBtn.textContent = `${wl > 0 ? ctx.t(S.waitLight, { h: wl }) : ctx.t(S.waitLight0)} (L)`
       waitLBtn.disabled = busy || wl === 0
       renderLeg()
     }
@@ -1380,6 +1386,15 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
           choose(options[n - 1])
           return true
         }
+        if (e.key === 'Enter' || e.key === ' ') {
+          // a focused card button handles Enter itself
+          if (document.activeElement instanceof HTMLButtonElement && evLayer.contains(document.activeElement)) return false
+          const i = btns.findIndex((b) => !b.disabled)
+          if (i >= 0) {
+            choose(options[i])
+            return true
+          }
+        }
         return false
       }
     }
@@ -1534,7 +1549,7 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
     function drawSai(): void {
       const cx = SC / 2
       const cy = SC / 2
-      const R = 56
+      const R = 46
       sg.clearRect(0, 0, SC, SC)
       const ang = (h: number) => -Math.PI / 2 + (h / P) * Math.PI * 2
       // dial
@@ -1546,7 +1561,7 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
       sg.arc(cx, cy, R + 6, 0, Math.PI * 2)
       sg.fill()
       // light and heavy arcs
-      sg.lineWidth = 9
+      sg.lineWidth = 8
       sg.strokeStyle = 'rgba(243,217,149,0.85)'
       sg.beginPath()
       sg.arc(cx, cy, R, ang(0), ang(LIGHT))
@@ -1576,7 +1591,7 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
             const t = start + h
             sg.strokeStyle = isHeavy(t + 0.01) ? 'rgba(255,90,106,0.95)' : 'rgba(95,242,224,0.9)'
             sg.beginPath()
-            sg.arc(cx, cy, R - 12, ang(t), ang(Math.min(t + 0.27, start + pl.d)))
+            sg.arc(cx, cy, R - 11, ang(t), ang(Math.min(t + 0.27, start + pl.d)))
             sg.stroke()
           }
           if (start !== now) {
@@ -1584,7 +1599,7 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
             sg.strokeStyle = 'rgba(236,228,212,0.55)'
             sg.lineWidth = 2
             sg.beginPath()
-            sg.arc(cx, cy, R - 12, ang(now), ang(start))
+            sg.arc(cx, cy, R - 11, ang(now), ang(start))
             sg.stroke()
             sg.setLineDash([])
           }
@@ -1616,10 +1631,10 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
       const heavy = isHeavy(time)
       sg.textAlign = 'center'
       sg.textBaseline = 'middle'
-      sg.font = '700 12px Cinzel, serif'
+      sg.font = '700 11px Cinzel, serif'
       sg.fillStyle = heavy ? '#ff7a88' : '#f3d995'
       sg.fillText(ctx.t(heavy ? S.heavy : S.light), cx, cy - 7)
-      sg.font = 'italic 12px "EB Garamond", serif'
+      sg.font = 'italic 11.5px "EB Garamond", serif'
       sg.fillStyle = 'rgba(236,228,212,0.8)'
       const rem = heavy ? P - now : LIGHT - now
       sg.fillText(ctx.t(heavy ? S.lightIn : S.heavyIn, { h: Math.round(rem * 10) / 10 }), cx, cy + 9)
