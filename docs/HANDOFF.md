@@ -42,4 +42,6 @@ The game is a single-player anime **narrative adventure** based on the novel *Nu
 - Interactable markers are 3D gems. A subtle 2D glow would suit plates better.
 - The Yera sprite has no side-idle frame or diagonal walks; the engine mirrors and falls back. Speaking and expressions are limited to the frames in its sheet.
 
+Playable demo (VITE_DEMO=1 build, New Game starts `demo_garden`): https://claude.ai/artifact/NrY3RYsV4XT2RA8pjpDxbP
+
 Branch: `claude/gallant-shannon-qo2otr`. The mirror target is `BranLang/null-void-rpg`, on the same branch name.
