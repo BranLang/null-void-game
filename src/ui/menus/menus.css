@@ -3276,3 +3276,93 @@
 :root[data-nv-reduced-motion] .nvm-title-eyes--aura {
   opacity: 0.4;
 }
+
+/* ============================================================ restrained pass
+   Quiet, book-like menus: sentence case, no diamonds, glows or gradient lines. */
+[class^='nvm-'],
+[class*=' nvm-'] {
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+}
+.nvm-glass {
+  background: rgba(14, 13, 18, 0.96);
+  border: 1px solid rgba(236, 228, 212, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.nvm-tbtn {
+  min-width: 260px;
+  padding: 0.55vh 24px;
+  font-family: var(--nv-font-body);
+  font-weight: 500;
+  font-size: calc(clamp(19px, 1.5vw, 24px) * var(--nv-text-scale));
+  color: rgba(236, 228, 212, 0.72);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
+}
+.nvm-tbtn-label {
+  padding-left: 0 !important;
+}
+.nvm-tbtn-label::before,
+.nvm-tbtn-label::after,
+.nvm-tbtn-glow {
+  display: none;
+}
+.nvm-tbtn-line {
+  width: 28px;
+  background: currentColor;
+  box-shadow: none;
+}
+.nvm-tbtn:hover,
+.nvm-tbtn:focus {
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
+}
+.nvm-title-sub-text {
+  padding-left: 0 !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9) !important;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.2em !important;
+}
+.nvm-corner,
+.nvm-corner::before,
+.nvm-corner::after,
+.nvm-divider i,
+.nvm-tab::before,
+.nvm-tab.is-active::before,
+.nvm-mbtn::before,
+.nvm-tip::before,
+.nvm-entry-mark,
+.nvm-objective-mark,
+.nvm-jchapter-mark {
+  display: none !important;
+}
+.nvm-divider b {
+  background: rgba(236, 228, 212, 0.12) !important;
+  box-shadow: none !important;
+}
+.nvm-tab.is-active::after {
+  background: currentColor !important;
+  box-shadow: none !important;
+}
+.nvm-mbtn {
+  border-left-width: 2px;
+}
+.nvm-mbtn:focus,
+.nvm-mbtn:hover {
+  background: rgba(236, 228, 212, 0.05) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+.nvm-range::-webkit-slider-thumb {
+  transform: none !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+}
+.nvm-range::-moz-range-thumb {
+  transform: none !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+}
+[class^='nvm-'],
+[class*=' nvm-'] {
+  text-shadow: none;
+}

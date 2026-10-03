@@ -10,8 +10,8 @@
   --nv-bg: #07060b;
   --nv-panel: rgba(14, 11, 22, 0.86);
   --nv-panel-solid: #120f1c;
-  --nv-panel-edge: rgba(201, 164, 92, 0.55);
-  --nv-line: rgba(201, 164, 92, 0.25);
+  --nv-panel-edge: rgba(236, 228, 212, 0.14);
+  --nv-line: rgba(236, 228, 212, 0.12);
   --nv-gold: #d6b26a;
   --nv-gold-bright: #f3d995;
   --nv-text: #ece4d4;
@@ -22,12 +22,12 @@
   --nv-ember: #ff8a3a;
   --nv-danger: #ff5a6a;
   --nv-frost: #cfe8ff;
-  --nv-font-title: 'Cinzel', 'Times New Roman', serif;
+  --nv-font-title: 'EB Garamond', Georgia, serif;
   --nv-font-body: 'EB Garamond', Georgia, serif;
-  --nv-radius: 10px;
+  --nv-radius: 3px;
   --nv-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  --nv-glow-aqua: 0 0 12px rgba(95, 242, 224, 0.6);
-  --nv-glow-violet: 0 0 14px rgba(183, 125, 255, 0.65);
+  --nv-glow-aqua: none;
+  --nv-glow-violet: none;
   --nv-text-scale: 1;
 }
 

@@ -669,3 +669,121 @@ body {
   color: var(--nv-gold);
   transition: opacity 0.6s;
 }
+
+/* ============================================================ restrained pass
+   Book-like, quiet UI: solid panels, sentence case, no glows or ornaments. */
+.nv-panel,
+.nv-dialogue {
+  background: rgba(13, 12, 17, 0.94);
+  border: 1px solid rgba(236, 228, 212, 0.1);
+  border-radius: 3px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+.nv-dialogue {
+  min-height: 0;
+  width: min(920px, 92vw);
+  padding: 18px 24px 20px 18px;
+}
+.nv-dialogue::before,
+.nv-dialogue::after {
+  display: none;
+}
+.nv-portrait {
+  width: 104px;
+  height: 104px;
+  border-radius: 2px;
+  border: 1px solid rgba(236, 228, 212, 0.12);
+  box-shadow: none;
+  align-self: flex-start;
+}
+.nv-portrait img,
+.nv-portrait canvas {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.nv-speaker {
+  font-family: var(--nv-font-body);
+  font-weight: 600;
+  font-size: calc(17px * var(--nv-text-scale));
+  letter-spacing: 0.01em;
+  text-transform: none;
+  text-shadow: none;
+}
+.nv-text {
+  font-size: calc(21px * var(--nv-text-scale));
+  line-height: 1.5;
+  text-shadow: none;
+}
+.nv-text.narration {
+  color: #cfc6b4;
+}
+.nv-text em {
+  color: inherit;
+}
+.nv-next {
+  border: none;
+  width: auto;
+  height: auto;
+  animation: none;
+  font-size: 13px;
+  color: var(--nv-text-dim);
+}
+.nv-next::before {
+  content: '▸';
+}
+.nv-choice {
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  padding: 6px 12px 6px 34px;
+}
+.nv-choice::before {
+  font-family: var(--nv-font-body);
+  color: var(--nv-text-dim);
+}
+.nv-choice:hover,
+.nv-choice.focus {
+  background: rgba(236, 228, 212, 0.05);
+  border-left-color: var(--nv-text);
+  color: #fff;
+  box-shadow: none;
+}
+.nv-objective {
+  border-left: 1px solid rgba(236, 228, 212, 0.35);
+  background: rgba(13, 12, 17, 0.7);
+  border-radius: 0;
+  font-size: calc(16px * var(--nv-text-scale));
+}
+.nv-objective .lbl {
+  font-family: var(--nv-font-body);
+  font-size: calc(12px * var(--nv-text-scale));
+  letter-spacing: 0.04em;
+  font-variant-caps: all-small-caps;
+  color: var(--nv-text-dim);
+}
+.nv-objective.pulse {
+  animation: none;
+}
+.nv-location .name {
+  font-family: var(--nv-font-body);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.nv-title {
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--nv-text);
+}
+.nv-btn {
+  font-family: var(--nv-font-body);
+  letter-spacing: 0.01em;
+  text-transform: none;
+  border-radius: 2px;
+  box-shadow: none !important;
+}
+
+.nv-speaker:empty {
+  display: none;
+}

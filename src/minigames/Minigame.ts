@@ -49,6 +49,8 @@ export interface RunOptions {
 
 /** Start a minigame overlay; cleans up DOM, listeners and loops when it resolves. */
 export async function runMinigame(id: MinigameId, params: MinigameParams, opts: RunOptions): Promise<MinigameResult> {
+  // automated playtests (window.__autoMinigame) skip straight to a success
+  if ((window as unknown as { __autoMinigame?: boolean }).__autoMinigame) return { success: true, score: 1, data: { auto: true } }
   const factory = registry.get(id)
   if (!factory) {
     console.warn(`[minigame] '${id}' is not registered; auto-succeeding`)

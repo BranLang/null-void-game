@@ -201,7 +201,7 @@ export class TitleScreen {
       'header',
       'nvm-title-head',
       procedural
-        ? h('div', { class: 'nvm-title-logo-float', style: "font-family:'Cinzel',serif;font-size:clamp(34px,6vw,76px);letter-spacing:0.18em;color:#e8d9b0;text-align:center" }, 'NULL VOID SAGA')
+        ? h('div', { class: 'nvm-title-logo-float', style: "font-family:'EB Garamond',Georgia,serif;font-weight:600;font-size:clamp(40px,6vw,84px);color:#efe6d2;text-align:center;text-shadow:0 2px 18px rgba(0,0,0,.8)" }, 'Null Void Saga')
         : h('div', 'nvm-title-logo-float', h('img', { class: 'nvm-title-logo', attrs: { src: 'assets/ui/logo.png', alt: 'Null Void Saga', draggable: 'false' } })),
       h('div', 'nvm-title-sub', h('span', 'nvm-title-sub-text', 'I · ELTÁRIA')),
     )

@@ -124,7 +124,7 @@ export class CreditsScreen {
             'div',
             'nvm-cr-block nvm-cr-logo',
             import.meta.env.VITE_PROCEDURAL
-              ? h('div', { style: "font-family:'Cinzel',serif;font-size:42px;letter-spacing:0.18em;color:#e8d9b0" }, 'NULL VOID SAGA')
+              ? h('div', { style: "font-family:'EB Garamond',Georgia,serif;font-weight:600;font-size:46px;color:#efe6d2" }, 'Null Void Saga')
               : h('img', { attrs: { src: 'assets/ui/logo.png', alt: 'Null Void Saga', draggable: 'false' } }),
             h('div', 'nvm-cr-sub', 'I · ELTÁRIA'),
             divider('nvm-cr-divider'),
