@@ -5,7 +5,7 @@ await p.addInitScript(() => { window.__autoMinigame = true })
 p.on('pageerror', (e) => console.log('ERR', e.message))
 p.on('console', (m) => { if (m.type() === 'error') console.log('CERR', m.text().slice(0, 160)) })
 await p.goto('http://localhost:5175/?scene=' + process.argv[2], { waitUntil: 'load' })
-await p.waitForTimeout(3000)
+await p.waitForTimeout(3000); await p.evaluate(() => { const g = window.__game; g.applySettings({ ...g.settings, quality: 'low', outlines: false }) })
 let fired = false
 for (let i = 0; i < +(process.argv[3] ?? 30); i++) {
   if (process.argv[4] && i === 8 && !fired) {
