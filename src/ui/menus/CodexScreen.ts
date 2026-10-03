@@ -3,6 +3,7 @@
  * parchment spread with the entry list on the left and the page on the right.
  * The calendar tab adds the wheel of the eleven months.
  */
+import { CAST } from '../../content/characters'
 import { CALENDAR_MONTHS, codexSection, resolveCodexId, type CodexSection } from '../../content/codex'
 import type { CodexEntry } from '../../content/types'
 import { getLang, l, onLangChange, t, type L } from '../../i18n/i18n'
@@ -417,10 +418,16 @@ export class CodexScreen {
     const kicker = [tabLabel ? t(tabLabel) : '', sec ? t(sec.title) : ''].filter(Boolean).join(' · ')
     const body = h('div', 'nvm-page-body')
     body.appendChild(richText(t(entry.body)))
-    // drop cap on the first plain paragraph
-    const firstPlain = Array.from(body.querySelectorAll('p')).find((p) => p.firstChild?.nodeType === Node.TEXT_NODE)
-    if (firstPlain && this.tab !== 'glossary') firstPlain.classList.add('nvm-dropcap')
-    const parts: (Node | null)[] = [h('div', 'nvm-page-kicker', kicker), h('h2', 'nvm-page-title', t(entry.title)), flourish('nvm-page-flourish')]
+    const paras = Array.from(body.querySelectorAll('p'))
+    // a first paragraph that is only an *italic* line is a tagline (caste · species · place)
+    const first = paras[0]
+    if (first && first.childNodes.length === 1 && first.firstChild instanceof HTMLElement && first.firstChild.tagName === 'EM') first.classList.add('nvm-tagline')
+    // drop cap on the first plain paragraph that is long enough to wrap around it
+    const firstPlain = paras.find((p) => p.firstChild?.nodeType === Node.TEXT_NODE)
+    if (firstPlain && this.tab !== 'glossary' && (firstPlain.textContent ?? '').length > 150) firstPlain.classList.add('nvm-dropcap')
+    const parts: (Node | null)[] = []
+    if (entry.category === 'people') parts.push(this.medallion(entry))
+    parts.push(h('div', 'nvm-page-kicker', kicker), h('h2', 'nvm-page-title', t(entry.title)), flourish('nvm-page-flourish'))
     if (this.tab === 'calendar') parts.push(h('div', 'nvm-wheel-wrap', calendarWheel(this.unlocked, id, (mid) => this.pickMonth(mid))))
     parts.push(body)
     if (id === 'cal.day') parts.push(h('div', 'nvm-figure-wrap', dayCycleFigure()))
@@ -435,6 +442,16 @@ export class CodexScreen {
       this.listEl?.querySelector(`[data-id="${CSS.escape(id)}"] .nvm-new`)?.remove()
       this.renderTabs()
     }
+  }
+
+  /** Portrait (painted art when the cast has it) or a monogram medallion. */
+  private medallion(entry: CodexEntry): HTMLElement {
+    const castId = entry.id.replace(/^people\./, '')
+    const cast = CAST[castId]
+    const el = h('div', { class: 'nvm-medallion', style: `--pc:${cast?.color ?? '#6a5aa0'}` })
+    if (cast?.portrait) el.appendChild(h('img', { attrs: { src: `assets/portraits/${cast.portrait}.webp`, alt: t(entry.title), draggable: 'false' } }))
+    else el.appendChild(h('span', 'nvm-medallion-mono', t(entry.title).slice(0, 1)))
+    return el
   }
 
   private pickMonth(id: string): void {

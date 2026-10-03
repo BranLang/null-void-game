@@ -67,6 +67,9 @@ export class Game implements MenuHost {
   sceneDef: SceneDef | null = null
   chapter: ChapterDef | null = null
   readonly actors = new Map<string, Actor>()
+  /** actors that follow the player (g.companion) */
+  readonly companions = new Set<string>()
+  private companionTimer = 0
   player: Actor | null = null
   readonly sai = new SaiClock()
   readonly spira = new SpiraState()
@@ -318,6 +321,7 @@ export class Game implements MenuHost {
     this.director.newEpoch()
     for (const a of this.actors.values()) a.release()
     this.actors.clear()
+    this.companions.clear()
     this.player?.release()
     this.player = null
     this.stealth?.dispose()
@@ -920,6 +924,28 @@ export class Game implements MenuHost {
     })
   }
 
+  /** Companions walk after the player when she gets more than a couple of tiles away. */
+  private updateCompanions(dt: number): void {
+    const p = this.player
+    const w = this.world
+    if (!p || !w || !this.companions.size || this.director.locked) return
+    this.companionTimer -= dt
+    if (this.companionTimer > 0) return
+    this.companionTimer = 0.4
+    let i = 0
+    for (const id of this.companions) {
+      const a = this.actors.get(id)
+      if (!a || !a.visible) continue
+      i++
+      const d = Math.hypot(a.x - p.x, a.y - p.y)
+      if (d < 1.8 + i * 0.6) continue
+      const path = w.grid.findPath(a.cell(), p.cell(), { ignoreDynamic: true })
+      if (!path || path.length < 2) continue
+      const stopAt = path.slice(0, Math.max(1, path.length - 1 - i))
+      void a.follow(stopAt, d > 5 ? 4.4 : 2.9, d > 5)
+    }
+  }
+
   // ======================================================================== triggers & exits
   private updateTriggers(): void {
     const def = this.sceneDef
@@ -973,6 +999,7 @@ export class Game implements MenuHost {
         }
         this.sai.update(dt)
         w.grid.leapOpen = this.sai.phase === 'light'
+        this.updateCompanions(dt)
         for (const a of this.actors.values()) a.update(dt)
         this.stealth?.update(dt)
         this.updateTriggers()

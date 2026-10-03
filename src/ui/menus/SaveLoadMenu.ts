@@ -35,6 +35,7 @@ const S = {
   loadFail: l('Načítanie zlyhalo', 'Loading failed'),
   cantSave: l('Teraz sa nedá ukladať.', 'You can’t save right now.'),
   justSaved: l('Práve uložené', 'Just saved'),
+  saveHint: l('Uložiť', 'Save'),
 }
 
 type Mode = 'save' | 'load'
@@ -141,7 +142,7 @@ export class SaveLoadMenu {
           'nvm-sheet-foot',
           hints([
             ['↑↓', COMMON.select],
-            ['Enter', mode === 'save' ? S.overYes : S.loadYes],
+            ['Enter', mode === 'save' ? S.saveHint : S.loadYes],
             ['Del', S.delete],
             ['Esc', COMMON.back],
           ]),

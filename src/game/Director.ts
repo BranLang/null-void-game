@@ -287,6 +287,15 @@ export class Director {
       glyph(who, level) {
         if (live()) actor(who)?.animator?.setGlyph(level)
       },
+      lift(who, height) {
+        const a = live() ? actor(who) : null
+        if (a) a.lift = height
+      },
+      companion(who, on) {
+        if (!live()) return
+        if (on) game.companions.add(who)
+        else game.companions.delete(who)
+      },
       pos(who) {
         return actor(who)?.cell() ?? [0, 0]
       },

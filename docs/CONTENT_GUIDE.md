@@ -152,6 +152,8 @@ All methods are documented in `src/game/GameAPI.ts`. The ones you will use most:
 | Move | `await g.walk('arkot', [5, 4])`, `g.teleport(...)`, `g.face('arkot', 'player')`, `g.pose('yera', 'kneel')` |
 | Expression | `g.mood('player', 'sad')`, where moods are neutral, happy, sad, angry, surprised, fear, pain, determined, tender, closed, blank |
 | Emote | `g.emote('arkot', '!')`, one of `!`, `?`, `…`, `♪`, `💢`, `💧` |
+| Companion | `g.companion('arkot', true)`: the actor follows the player (false to stop) |
+| Float | `g.lift('tami', 0.8)`: raise an actor off the ground smoothly (0 = down) |
 | Spawn/despawn | `g.spawn({ id, character, at })`, `g.despawn(id)`, `g.show(id, false)`, `g.costume('player', 'yera')` |
 | Camera | `await g.focus('arkot', { zoom: 1.2 })`, `g.follow()`, `g.shake()`, `await g.zoom(0.8)`, `g.cinematic(true)` |
 | Time | `await g.wait(800)`, `await g.until(() => cond)` |

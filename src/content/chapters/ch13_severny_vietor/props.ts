@@ -336,3 +336,24 @@ registerProp('c13_wolfstone', {
     })
   },
 })
+
+// ---------------------------------------------------------------------------------- dying campfire embers
+registerProp('c13_embers', {
+  solid: true,
+  light: { color: '#ff5a1a', intensity: 1.1, distance: 3.2, y: 0.25, flicker: true },
+  build: () =>
+    cachedBuild('c13_embers', () => {
+      const g = new THREE.Group()
+      const stone = F(PAL.stoneDark)
+      for (let i = 0; i < 9; i++) {
+        const a = (i / 9) * Math.PI * 2
+        g.add(ball(0.11, 0.08, 0.1, stone, Math.cos(a) * 0.38, 0.03, Math.sin(a) * 0.38, 6))
+      }
+      g.add(ball(0.24, 0.05, 0.24, M('#2a2420'), 0, 0.02, 0, 10))
+      for (let i = 0; i < 6; i++) {
+        const a = i * 1.7
+        g.add(ball(0.05, 0.03, 0.05, glowMat(PAL.ember, 2.2), Math.cos(a) * 0.14, 0.05, Math.sin(a) * 0.14, 6))
+      }
+      return g
+    }),
+})

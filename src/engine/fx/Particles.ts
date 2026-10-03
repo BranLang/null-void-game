@@ -308,10 +308,66 @@ class System {
   }
 }
 
+/** Rain drawn as falling streaks (line segments) instead of dots. */
+class RainSystem {
+  readonly lines: THREE.LineSegments
+  private pos: Float32Array
+  private drops: Float32Array
+  constructor(
+    readonly spec: ParticleSpec,
+    private area: [number, number, number, number],
+  ) {
+    const n = spec.count ?? 900
+    this.pos = new Float32Array(n * 6)
+    this.drops = new Float32Array(n * 4)
+    for (let i = 0; i < n; i++) this.respawn(i, true)
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3))
+    const mat = new THREE.LineBasicMaterial({ color: new THREE.Color(spec.color ?? '#a8c4e8'), transparent: true, opacity: 0.42, depthWrite: false })
+    this.lines = new THREE.LineSegments(geo, mat)
+    this.lines.frustumCulled = false
+    this.lines.layers.set(FX_LAYER)
+    this.lines.renderOrder = 5
+  }
+  private respawn(i: number, initial: boolean): void {
+    const [x0, z0, x1, z1] = this.area
+    this.drops[i * 4] = x0 + Math.random() * (x1 - x0)
+    this.drops[i * 4 + 1] = initial ? Math.random() * 12 : 12 + Math.random() * 2
+    this.drops[i * 4 + 2] = z0 + Math.random() * (z1 - z0)
+    this.drops[i * 4 + 3] = 14 + Math.random() * 5
+  }
+  update(dt: number): void {
+    const n = this.drops.length / 4
+    for (let i = 0; i < n; i++) {
+      const d = i * 4
+      const v = this.drops[d + 3]
+      this.drops[d + 1] -= v * dt
+      this.drops[d] -= 1.2 * dt
+      if (this.drops[d + 1] < 0) this.respawn(i, false)
+      const x = this.drops[d]
+      const y = this.drops[d + 1]
+      const z = this.drops[d + 2]
+      const o = i * 6
+      this.pos[o] = x
+      this.pos[o + 1] = y
+      this.pos[o + 2] = z
+      this.pos[o + 3] = x + 0.04
+      this.pos[o + 4] = y + v * 0.035
+      this.pos[o + 5] = z
+    }
+    this.lines.geometry.attributes.position.needsUpdate = true
+  }
+  dispose(): void {
+    this.lines.geometry.dispose()
+    ;(this.lines.material as THREE.Material).dispose()
+  }
+}
+
 export class Particles {
   readonly group = new THREE.Group()
   private systems: System[] = []
   private bursts: System[] = []
+  private rains: RainSystem[] = []
 
   constructor(private mapArea: [number, number, number, number]) {
     this.group.name = 'particles'
@@ -319,12 +375,26 @@ export class Particles {
 
   add(spec: ParticleSpec): void {
     const area = spec.area ? ([spec.area[0] - 0.5, spec.area[1] - 0.5, spec.area[2] + 0.5, spec.area[3] + 0.5] as [number, number, number, number]) : this.mapArea
+    if (spec.kind === 'rain') {
+      const r = new RainSystem(spec, area)
+      this.rains.push(r)
+      this.group.add(r.lines)
+      return
+    }
     const sys = new System(spec, area, KINDS[spec.kind])
     this.systems.push(sys)
     this.group.add(sys.points)
   }
 
   remove(id: string): void {
+    this.rains = this.rains.filter((r) => {
+      if (r.spec.id === id) {
+        this.group.remove(r.lines)
+        r.dispose()
+        return false
+      }
+      return true
+    })
     this.systems = this.systems.filter((s) => {
       if (s.spec.id === id) {
         this.group.remove(s.points)
@@ -345,6 +415,7 @@ export class Particles {
   }
 
   update(dt: number): void {
+    for (const r of this.rains) r.update(dt)
     for (const s of this.systems) s.update(dt)
     this.bursts = this.bursts.filter((b) => {
       const alive = b.update(dt)
@@ -357,6 +428,11 @@ export class Particles {
   }
 
   dispose(): void {
+    for (const r of this.rains) {
+      this.group.remove(r.lines)
+      r.dispose()
+    }
+    this.rains = []
     for (const s of [...this.systems, ...this.bursts]) {
       this.group.remove(s.points)
       s.dispose()

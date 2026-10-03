@@ -110,6 +110,10 @@ export interface GameAPI {
   costume(who: ActorRef, castId: string): void
   /** Glyph glow on an actor (0 dim .. 3 blazing). */
   glyph(who: ActorRef, level: number): void
+  /** Raise an actor off the ground (floating, possessed, carried), smoothly. 0 = back on the ground. */
+  lift(who: ActorRef, height: number): void
+  /** Make an actor follow the player around the scene (true) or stop (false). */
+  companion(who: ActorRef, on: boolean): void
   /** Current grid position of an actor. */
   pos(who: ActorRef): Vec2
   /** Distance in tiles between two actors (or actor and cell). */

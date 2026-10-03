@@ -740,35 +740,40 @@ export interface ReaderOptions {
   t: (s: L) => string
 }
 
-/** Book of El cipher marks: a few geometric glyphs scattered over the parchment. */
-function cipherMarks(): SVGSVGElement {
-  const svg = s('svg', { class: 'nvm-doc-marks', viewBox: '0 0 400 560', preserveAspectRatio: 'none', 'aria-hidden': 'true' })
-  const g = s('g', { fill: 'none', stroke: 'currentColor', 'stroke-width': 1.1 })
+/** Geometric cipher marks scattered over the parchment (kept undistorted). */
+function cipherMarks(): HTMLElement {
+  const wrap = h('div', { class: 'nvm-doc-marks', attrs: { 'aria-hidden': 'true' } })
   const marks: [number, number, number, number][] = [
-    [40, 60, 14, 0],
-    [356, 92, 11, 1],
-    [70, 500, 12, 2],
-    [338, 470, 16, 3],
-    [200, 34, 9, 4],
-    [24, 280, 10, 1],
-    [378, 300, 9, 2],
-    [190, 528, 10, 0],
+    [7, 9, 0, 0],
+    [92, 13, 1, 15],
+    [9, 88, 2, 0],
+    [88, 82, 3, -12],
+    [50, 5, 4, 0],
+    [5, 50, 1, 0],
+    [95, 52, 2, 20],
+    [47, 94, 0, 0],
   ]
-  for (const [x, y, r, kind] of marks) {
-    if (kind === 0) g.append(s('circle', { cx: x, cy: y, r }), s('path', { d: `M${x - r} ${y} H${x + r} M${x} ${y - r} V${y + r}` }))
-    else if (kind === 1) g.append(s('path', { d: `M${x} ${y - r} L${x + r * 0.87} ${y + r / 2} L${x - r * 0.87} ${y + r / 2} Z` }), s('circle', { cx: x, cy: y, r: r / 3 }))
-    else if (kind === 2) g.append(s('rect', { x: x - r, y: y - r, width: r * 2, height: r * 2, transform: `rotate(45 ${x} ${y})` }), s('path', { d: `M${x - r} ${y} H${x + r}` }))
+  for (const [x, y, kind, rot] of marks) {
+    const g = s('g', { fill: 'none', stroke: 'currentColor', 'stroke-width': 1.1, transform: `rotate(${rot} 17 17)` })
+    const c = 17
+    const r = 13
+    if (kind === 0) g.append(s('circle', { cx: c, cy: c, r }), s('path', { d: `M${c - r} ${c} H${c + r} M${c} ${c - r} V${c + r}` }))
+    else if (kind === 1) g.append(s('path', { d: `M${c} ${c - r} L${c + r * 0.87} ${c + r / 2} L${c - r * 0.87} ${c + r / 2} Z` }), s('circle', { cx: c, cy: c, r: r / 3 }))
+    else if (kind === 2) g.append(s('rect', { x: c - r * 0.7, y: c - r * 0.7, width: r * 1.4, height: r * 1.4, transform: `rotate(45 ${c} ${c})` }), s('path', { d: `M${c - r} ${c} H${c + r}` }))
     else if (kind === 3) {
       const pts: string[] = []
       for (let i = 0; i < 5; i++) {
         const a = -Math.PI / 2 + (i * 4 * Math.PI) / 5
-        pts.push(`${(x + Math.cos(a) * r).toFixed(1)} ${(y + Math.sin(a) * r).toFixed(1)}`)
+        pts.push(`${(c + Math.cos(a) * r * 0.85).toFixed(1)} ${(c + Math.sin(a) * r * 0.85).toFixed(1)}`)
       }
-      g.append(s('path', { d: `M${pts.join(' L')} Z` }), s('circle', { cx: x, cy: y, r: r * 1.15 }))
-    } else g.append(s('path', { d: `M${x - r} ${y + r} L${x} ${y - r} L${x + r} ${y + r} M${x - r / 2} ${y} H${x + r / 2}` }))
+      g.append(s('path', { d: `M${pts.join(' L')} Z` }), s('circle', { cx: c, cy: c, r }))
+    } else g.append(s('path', { d: `M${c - r} ${c + r * 0.8} L${c} ${c - r * 0.8} L${c + r} ${c + r * 0.8} M${c - r / 2} ${c} H${c + r / 2}` }))
+    const svg = s('svg', { viewBox: '0 0 34 34' }, g)
+    svg.style.left = `${x}%`
+    svg.style.top = `${y}%`
+    wrap.appendChild(svg)
   }
-  svg.appendChild(g)
-  return svg
+  return wrap
 }
 
 const READER_LABELS: Record<ReaderStyle, L> = {
