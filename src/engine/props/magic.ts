@@ -641,7 +641,7 @@ registerProp('ice_spike', {
       const g = new THREE.Group()
       const ice = F('#bfe8ff', { emissive: '#5fb8ff', ei: 0.35 })
       const ice2 = F('#e6f6ff', { emissive: '#8fd0ff', ei: 0.3 })
-      g.add(ball(0.38, 0.1, 0.34, M('#f4fbff'), 0, 0.0, 0, 14))
+      g.add(ball(0.38, 0.1, 0.34, M('#d8eaf6'), 0, 0.0, 0, 14))
       g.add(cn(0.17, 1.25, ice, 0, -0.05, 0, 5).rotateZ(0.08))
       const n = 4
       for (let i = 0; i < n; i++) {
@@ -721,6 +721,17 @@ registerProp('frost_patch', {
     const d = decal(size, size, m, 0.011)
     d.rotation.z = ctx.rand() * Math.PI * 2
     g.add(d)
-    return g
+    // a few small ice shards poking out of the frost
+    const shard = F('#d6f0ff', { emissive: '#8fd0ff', ei: 0.25 })
+    const r = seeded('frostshards' + v)
+    for (let i = 0; i < 5; i++) {
+      const a = r() * Math.PI * 2
+      const dist = r() * size * 0.3
+      const s = cn(0.025 + r() * 0.02, 0.08 + r() * 0.1, shard, Math.cos(a) * dist, -0.01, Math.sin(a) * dist, 4)
+      s.rotation.set((r() - 0.5) * 0.8, r() * 3, (r() - 0.5) * 0.8)
+      s.castShadow = false
+      g.add(s)
+    }
+    return finalize(g)
   },
 })

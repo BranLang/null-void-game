@@ -309,7 +309,7 @@ registerProp('bed', {
       g.add(bx(0.92, 0.07, 1.22, bm, 0, 0.42, 0.8))
       g.add(bx(0.93, 0.26, 0.04, bm, 0, 0.2, 1.39))
       g.add(rod([-0.46, 0.5, 0.2], [0.46, 0.5, 0.2], 0.05, 0.05, M(shade(blanket, 1.25)), 10))
-      g.add(ball(0.3, 0.075, 0.16, M('#ffffff'), 0, 0.53, -0.24, 14))
+      g.add(ball(0.3, 0.075, 0.16, M('#ece6da'), 0, 0.53, -0.24, 14))
       return g
     })
   },
@@ -614,7 +614,7 @@ registerProp('bowl', {
       g.add(cy(0.13, 0.07, 0.06, dark, 0, 0.7, 0, 16))
       g.add(lathe('shallowbowl', [[0, 0], [0.12, 0], [0.24, 0.05], [0.29, 0.12], [0.27, 0.12], [0.2, 0.07], [0, 0.06]], M('#e6ddcc'), 22).translateY(0.75))
       if (frozen) {
-        const ice = M('#eef8ff', { emissive: '#9fd8ff', ei: 0.35 })
+        const ice = M('#d6ecfa', { emissive: '#9fd8ff', ei: 0.18 })
         g.add(ball(0.26, 0.04, 0.26, ice, 0, 0.86, 0, 16))
         const shard = F('#f4fbff', { emissive: '#bfe8ff', ei: 0.4 })
         for (let i = 0; i < 6; i++) {
@@ -623,7 +623,7 @@ registerProp('bowl', {
           s.rotation.set(Math.sin(a) * 0.4, 0, -Math.cos(a) * 0.4)
           g.add(s)
         }
-        g.add(ring(0.28, 0.02, M('#ffffff'), 0, 0.87, 0, 5, 24))
+        g.add(ring(0.28, 0.02, M('#e4f2fc'), 0, 0.87, 0, 5, 24))
       } else {
         const water = cy(0.25, 0.25, 0.01, M('#4aa8d0', { emissive: '#1d6a90', ei: 0.35 }), 0, 0.84, 0, 22)
         fx(water)
@@ -1260,7 +1260,10 @@ registerProp('cauldron', {
     for (let i = 0; i < 5; i++) {
       const a = r() * Math.PI * 2
       const d = r() * 0.2
-      const b = ball(0.03 + r() * 0.025, 0.03 + r() * 0.025, 0.03 + r() * 0.025, bm, Math.cos(a) * d, 0.68, Math.sin(a) * d, 6)
+      const s = 0.03 + r() * 0.025
+      const b = new THREE.Group()
+      b.position.set(Math.cos(a) * d, 0.68, Math.sin(a) * d)
+      b.add(ball(s, s, s, bm, 0, 0, 0, 6))
       b.userData.phase = r() * 6
       bubbles.add(b)
     }

@@ -32,8 +32,8 @@ export const PAL = {
   stone: '#a8a092',
   stoneDark: '#76706a',
   stoneLight: '#cfc7b7',
-  white: '#f3ecdc',
-  whiteShade: '#ddd2bc',
+  white: '#ebe3d1',
+  whiteShade: '#d4c8b0',
   andesite: '#3d3944',
   andesiteDark: '#29262f',
   obsidian: '#1c1826',
@@ -66,7 +66,7 @@ export const PAL = {
   teal: '#2fa69a',
   orange: '#f08a3a',
   rope: '#c9a46a',
-  bone: '#f0e5c8',
+  bone: '#e9dcbc',
   paper: '#f7f0dc',
   ink: '#1a1020',
   // glow colours (use with glowMat / emissive)
@@ -680,6 +680,7 @@ export function flame(size: number, phase: number, color: string = PAL.flame, co
   g.add(rot(cn(0.035 * size, 0.13 * size, outer, -0.05 * size, 0.07 * size, 0.015 * size, 6), 0.25, 0, 0.5))
   g.add(ball(0.05 * size, 0.055 * size, 0.05 * size, inner, 0, 0.075 * size, 0, 8))
   g.add(cn(0.048 * size, 0.17 * size, inner, 0, 0.08 * size, 0, 8))
+  finalize(g)
   fx(g)
   keep(g)
   g.userData.phase = phase

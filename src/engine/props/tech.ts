@@ -285,7 +285,7 @@ registerProp('airship', {
   footprint: AIRSHIP_FOOT,
   light: { color: '#ffbb77', intensity: 1.6, distance: 6, y: 1.2 },
   build: (ctx) => {
-    const color = tint(ctx, '#d8c49a')
+    const color = tint(ctx, '#cbb284')
     const g = new THREE.Group()
     // envelope
     const env = new THREE.Mesh(
@@ -1110,7 +1110,7 @@ function planetTex(): THREE.CanvasTexture {
 
 registerProp('hologram', {
   solid: true,
-  light: { color: '#6ab8ff', intensity: 2.2, distance: 6, y: 1.6 },
+  light: { color: '#6ab8ff', intensity: 1.6, distance: 6, y: 1.6 },
   build: (ctx) => {
     const color = tint(ctx, '#7fd8ff')
     const g = new THREE.Group()
@@ -1119,23 +1119,23 @@ registerProp('hologram', {
     g.add(cy(0.36, 0.42, 0.12, dark, 0, 0, 0, 20))
     g.add(cy(0.24, 0.3, 0.52, mid, 0, 0.12, 0, 16))
     g.add(cy(0.3, 0.26, 0.08, dark, 0, 0.64, 0, 20))
-    g.add(ring(0.24, 0.025, glowMat(color, 3), 0, 0.72, 0, 5, 24))
-    g.add(cy(0.12, 0.12, 0.02, glowMat('#ffffff', 3), 0, 0.71, 0, 16))
+    g.add(ring(0.24, 0.025, glowMat(color, 2.6), 0, 0.72, 0, 5, 24))
+    g.add(cy(0.12, 0.12, 0.02, glowMat(color, 1.6), 0, 0.71, 0, 16))
     for (let i = 0; i < 4; i++) {
       const a = (i / 4) * Math.PI * 2
       g.add(bx(0.03, 0.3, 0.02, glowMat(color, 2.4), Math.cos(a) * 0.255, 0.22, Math.sin(a) * 0.255).rotateY(-a))
     }
-    const beam = new THREE.Mesh(cachedGeo('holobeam', () => new THREE.CylinderGeometry(0.5, 0.1, 1, 20, 1, true)), additive(color, 1.2, 0.16))
+    const beam = new THREE.Mesh(cachedGeo('holobeam', () => new THREE.CylinderGeometry(0.5, 0.1, 1, 20, 1, true)), additive(color, 0.7, 0.12))
     beam.scale.set(1, 0.72, 1)
     beam.position.set(0, 1.08, 0)
     fx(beam)
     g.add(beam)
     const holo = new THREE.Group()
     holo.position.set(0, 1.78, 0)
-    const planet = new THREE.Mesh(cachedGeo('holosphere', () => new THREE.SphereGeometry(0.42, 28, 18)), additive(color, 1.5, 0.85, planetTex(), true))
+    const planet = new THREE.Mesh(cachedGeo('holosphere', () => new THREE.SphereGeometry(0.42, 28, 18)), additive(color, 0.6, 0.6, planetTex(), true))
     holo.add(planet)
     const shell = new THREE.Mesh(cachedGeo('holoshell', () => new THREE.IcosahedronGeometry(0.47, 1)), cachedMat(`holowire|${color}`, () => {
-      const m = additive(color, 1.6, 0.35, null, true)
+      const m = additive(color, 0.7, 0.3, null, true)
       m.wireframe = true
       return m
     }))
@@ -1144,12 +1144,12 @@ registerProp('hologram', {
     for (const [R, tilt] of [[0.66, 1.25], [0.8, 1.9]] as const) {
       const rg = new THREE.Group()
       rg.rotation.x = tilt
-      rg.add(torus(R, 0.01, additive(color, 2.6, 0.9), 0, 0, 0, 4, 48))
+      rg.add(torus(R, 0.01, additive(color, 1.5, 0.85), 0, 0, 0, 4, 48))
       holo.add(rg)
       rings.push(rg)
     }
     const moon = new THREE.Group()
-    moon.add(ball(0.07, 0.07, 0.07, additive('#ffd28a', 2.4, 0.9), 0.78, 0, 0, 10))
+    moon.add(ball(0.07, 0.07, 0.07, additive('#ffd28a', 1.2, 0.9), 0.78, 0, 0, 10))
     moon.rotation.x = 0.3
     holo.add(moon)
     fx(holo)
@@ -1165,7 +1165,7 @@ registerProp('hologram', {
     h.rings[0].rotation.z += dt * 0.5
     h.rings[1].rotation.z -= dt * 0.3
     h.moon.rotation.y += dt * 0.8
-    h.mat.opacity = 0.78 + Math.sin(t * 13) * 0.04 + (Math.sin(t * 0.7) > 0.97 ? -0.3 : 0)
+    h.mat.opacity = 0.56 + Math.sin(t * 13) * 0.03 + (Math.sin(t * 0.7) > 0.97 ? -0.25 : 0)
   },
 })
 
@@ -1209,7 +1209,9 @@ registerProp('tower', {
       strip.rotation.y = -a
       g.add(strip)
     }
-    const beacon = ball(0.11, 0.11, 0.11, glowMat(PAL.tech, 3.6), 0, 0.3 + 8.85 * k, 0, 10)
+    const beacon = new THREE.Group()
+    beacon.position.set(0, 0.3 + 8.85 * k, 0)
+    beacon.add(ball(0.11, 0.11, 0.11, glowMat(PAL.tech, 3.6), 0, 0, 0, 10))
     fx(beacon)
     keep(beacon)
     g.add(beacon)

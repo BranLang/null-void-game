@@ -37,7 +37,8 @@ export function h<K extends keyof HTMLElementTagNameMap>(tag: K, props?: Props |
     if (props.style) e.setAttribute('style', props.style)
     if (props.data) for (const [k, v] of Object.entries(props.data)) e.dataset[k] = v
     if (props.attrs) for (const [k, v] of Object.entries(props.attrs)) e.setAttribute(k, v)
-    if (props.onclick) e.addEventListener('click', props.onclick)
+    const onclick = props.onclick
+    if (onclick) e.addEventListener('click', (ev) => onclick(ev as MouseEvent))
   }
   append(e, kids)
   return e

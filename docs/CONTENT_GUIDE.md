@@ -224,8 +224,18 @@ Do this at module top level (before `export default`).
 
 ## 6. Props
 
-The catalogue is in `src/engine/props/*.ts`. Run `npx vite` and open `/gallery.html` to see them all.
-Statues: `mother_statue` (params `black`, `armsUp`), `el_statue`, `yera_statue`.
+The catalogue is in `src/engine/props/*.ts` (103 types). Run `npx vite` and open `/gallery.html` to see them all
+(`?filter=a,b`, `?night=1`). Statues: `mother_statue` (params `black`, `armsUp`), `el_statue`, `yera_statue`.
+
+* **Wall-mounted props** (window, torch, mosaic, painting, wall clock, shelf, awning, wall banner/chalkboard,
+  ladder; bookshelf and cabinet back onto walls too) have their back at z = −0.5: place them on the floor
+  cell *in front of* the wall and rotate so the back faces the wall (`rot: 0` = back toward row−1,
+  `rot: 90`, `180`, `270` for the other sides).
+* Open doors and gates: set `solid: false` on the placement (solidity cannot change at runtime; toggle a
+  closed/open pair with `id` + `g.propVisible`).
+* Water props (`lily`, `bridge`, `dock_post`, `sluice`, `waterwheel`) sit on or reach into water cells.
+* Props with footprints (airship 3×5, itaka 3×7, stall, bed, approacher, waterwheel, skeleton, star_wall,
+  temple_tree/jungle_tree) block several cells. Leave room around them.
 
 ## 7. Testing your chapter
 

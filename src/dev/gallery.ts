@@ -17,6 +17,7 @@ import { LIQUID_SURFACE } from '../engine/MapBuilder'
  *   ?zoom=2             zoom factor on top of the auto fit
  *   ?ref=0              hide the 1.7 m reference figure
  *   ?outline=0          disable the ink outline pass
+ *   ?stats=1            log draw calls (meshes) and triangles per prop
  * Drag to pan, mouse wheel to zoom.
  */
 
@@ -136,9 +137,9 @@ rig.maxZoom = 40
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(night ? '#0a0b14' : '#3b4356')
 
-const hemi = night ? new THREE.HemisphereLight('#5a6aaa', '#141018', 0.55) : new THREE.HemisphereLight('#dfe8ff', '#5a4a40', 1.55)
+const hemi = night ? new THREE.HemisphereLight('#6a7ac0', '#1c1824', 0.95) : new THREE.HemisphereLight('#dfe8ff', '#5a4a40', 1.3)
 scene.add(hemi)
-const sun = night ? new THREE.DirectionalLight('#a8b8ff', 0.55) : new THREE.DirectionalLight('#fff0d8', 2.4)
+const sun = night ? new THREE.DirectionalLight('#a8b8ff', 0.7) : new THREE.DirectionalLight('#fff0d8', 2.2)
 sun.castShadow = true
 scene.add(sun)
 scene.add(sun.target)
@@ -193,7 +194,7 @@ function gridTexture(base: string, line: string): THREE.CanvasTexture {
   return t
 }
 
-const slabSide = toon(night ? '#24222c' : '#4a4652')
+const slabSide = toon(night ? '#34323e' : '#4a4652')
 const waterMat = new THREE.MeshBasicMaterial({ color: night ? '#1d4a66' : '#3a8cb0', transparent: true, opacity: 0.72, depthWrite: false })
 const bedMat = toon(night ? '#141820' : '#2a3a44')
 const wallMat = toon(night ? '#4a4652' : '#d8cfbf')
@@ -208,7 +209,7 @@ function slabFor(entryType: string, box: THREE.Box3): THREE.Group {
   const d = z1 - z0
   const water = WATER.has(entryType)
   const top = water ? -0.62 : 0
-  const tex = gridTexture(night ? '#2c2a34' : '#5b5664', night ? '#24222b' : '#514c5a')
+  const tex = gridTexture(night ? '#4a4756' : '#5b5664', night ? '#3e3b48' : '#514c5a')
   tex.repeat.set(w, d)
   const topMat = toon('#ffffff', { map: tex })
   const geo = new THREE.BoxGeometry(w, 0.3, d)
@@ -428,7 +429,24 @@ sc.updateProjectionMatrix()
 const mapSize = radius > 24 ? 4096 : 2048
 sun.shadow.mapSize.set(mapSize, mapSize)
 sun.shadow.bias = -0.0004
-sun.shadow.normalBias = 0.02
+sun.shadow.normalBias = 0.05
+
+if (qs.get('stats') === '1') {
+  const rowsOut: string[] = []
+  for (const it of items) {
+    let meshes = 0
+    let tris = 0
+    it.obj.traverse((o) => {
+      if (o instanceof THREE.Mesh) {
+        meshes++
+        const geo = o.geometry as THREE.BufferGeometry
+        tris += (geo.index ? geo.index.count : geo.getAttribute('position').count) / 3
+      }
+    })
+    rowsOut.push(`${it.entry.type}${it.entry.sub ? ' [' + it.entry.sub + ']' : ''}: ${meshes} meshes, ${Math.round(tris)} tris`)
+  }
+  console.log('[stats]\n' + rowsOut.join('\n'))
+}
 
 if (hud) {
   hud.innerHTML = `<b>${items.length - (showRef ? 1 : 0)}</b> props/variants · ${lightCount} lights${lightCount >= MAX_LIGHTS ? ' (capped)' : ''} · drag = pan · wheel = zoom · <i>?filter=a,b ?night=1 ?variants=0 ?zoom=2</i>`

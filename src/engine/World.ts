@@ -53,7 +53,7 @@ interface LightState {
   vignette: number
 }
 
-const CAM_DIST = 60
+const CAM_DIST = 100
 
 export class World {
   readonly scene = new THREE.Scene()
@@ -108,7 +108,7 @@ export class World {
     this.scene.add(this.sun)
     this.scene.add(this.sun.target)
     for (let i = 0; i < 8; i++) {
-      const pl = new THREE.PointLight('#ffffff', 0, 6, 1.6)
+      const pl = new THREE.PointLight('#ffffff', 0, 6, 2)
       pl.visible = false
       this.pool.push(pl)
       this.scene.add(pl)
@@ -160,7 +160,7 @@ export class World {
       const m = o as THREE.Mesh
       if (m.isMesh) {
         const basic = (m.material as THREE.Material & { isMeshBasicMaterial?: boolean }).isMeshBasicMaterial
-        m.castShadow = cast && !basic
+        m.castShadow = m.castShadow && cast && !basic
         m.receiveShadow = true
         if (basic) m.layers.set(FX_LAYER)
       }

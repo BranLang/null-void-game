@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="sk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu Preview</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #07060b;
+      }
+      #fake-game {
+        position: fixed;
+        inset: 0;
+        background:
+          linear-gradient(rgba(10, 8, 20, 0.15), rgba(10, 8, 20, 0.35)),
+          url('assets/ui/title_bg.jpg') center / cover;
+      }
+      #log {
+        position: fixed;
+        left: 8px;
+        top: 6px;
+        z-index: 200;
+        font: 12px monospace;
+        color: #9f9;
+        pointer-events: none;
+        text-shadow: 0 1px 2px #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="log"></div>
+    <script type="module" src="/src/dev/menus.ts"></script>
+  </body>
+</html>

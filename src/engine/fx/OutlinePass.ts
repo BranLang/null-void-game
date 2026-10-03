@@ -35,7 +35,7 @@ export class OutlinePass extends Pass {
         uThickness: { value: this.thickness },
         uStrength: { value: this.strength },
         uNear: { value: 0.1 },
-        uFar: { value: 400 },
+        uFar: { value: 600 },
         uInk: { value: new THREE.Color('#1a1020') },
         uDebug: { value: 0 },
       },

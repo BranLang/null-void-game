@@ -372,7 +372,7 @@ registerProp('window', {
 
 registerProp('lamppost', {
   solid: true,
-  light: (ctx) => ({ color: tint(ctx, '#ffc27a'), intensity: 3, distance: 7.5, y: 2.78 }),
+  light: (ctx) => ({ color: tint(ctx, '#ffc27a'), intensity: 3, distance: 7.5, y: 2.85 }),
   build: (ctx) => {
     const glass = tint(ctx, PAL.warm)
     const brass = str(ctx, 'style', 'iron') === 'brass'
@@ -385,14 +385,14 @@ registerProp('lamppost', {
       g.add(cy(0.045, 0.06, 2.2, iron, 0, 0.36, 0, 10))
       g.add(cy(0.075, 0.075, 0.06, trim, 0, 1.0, 0, 12))
       g.add(cy(0.07, 0.07, 0.05, trim, 0, 2.38, 0, 12))
-      g.add(cy(0.15, 0.07, 0.1, iron, 0, 2.56, 0, 12))
-      g.add(cy(0.15, 0.12, 0.3, glowMat(glass, 3), 0, 2.64, 0, 6))
+      g.add(cy(0.19, 0.08, 0.12, iron, 0, 2.54, 0, 12))
+      g.add(cy(0.19, 0.15, 0.38, glowMat(glass, 3), 0, 2.64, 0, 6))
       for (let i = 0; i < 6; i++) {
         const a = (i / 6) * Math.PI * 2
-        g.add(rod([Math.cos(a) * 0.125, 2.64, Math.sin(a) * 0.125], [Math.cos(a) * 0.155, 2.95, Math.sin(a) * 0.155], 0.012, 0.012, iron, 4))
+        g.add(rod([Math.cos(a) * 0.16, 2.64, Math.sin(a) * 0.16], [Math.cos(a) * 0.198, 3.03, Math.sin(a) * 0.198], 0.014, 0.014, iron, 4))
       }
-      g.add(cn(0.22, 0.2, trim, 0, 2.94, 0, 6))
-      g.add(ball(0.045, 0.045, 0.045, trim, 0, 3.17, 0, 8))
+      g.add(cn(0.28, 0.24, trim, 0, 3.02, 0, 6))
+      g.add(ball(0.055, 0.055, 0.055, trim, 0, 3.29, 0, 8))
       return g
     })
   },
@@ -433,6 +433,7 @@ registerProp('lantern', {
     const glass = tint(ctx, PAL.warm)
     const g = new THREE.Group()
     const head = finalize(lanternHead(glass))
+    head.scale.setScalar(1.35)
     keep(head)
     if (style === 'post') {
       const wood = M(PAL.woodDark)
@@ -440,14 +441,14 @@ registerProp('lantern', {
       g.add(bx(0.16, 0.12, 0.16, M(PAL.stoneDark), 0, 0))
       g.add(bx(0.52, 0.07, 0.07, wood, 0.22, 1.66))
       g.add(rot(bx(0.05, 0.3, 0.05, wood, 0.12, 1.42), 0, 0, -0.75))
-      g.add(rod([0.42, 1.66, 0], [0.42, 1.58, 0], 0.008, 0.008, M(PAL.iron), 4))
-      head.position.set(0.42, 1.58, 0)
+      g.add(rod([0.42, 1.66, 0], [0.42, 1.6, 0], 0.01, 0.01, M(PAL.iron), 4))
+      head.position.set(0.42, 1.62, 0)
     } else if (style === 'hanging') {
       g.add(rod([0, 2.42, 0], [0, 2.02, 0], 0.01, 0.01, M(PAL.iron), 4))
       g.add(bx(0.14, 0.03, 0.14, M(PAL.ironDark), 0, 2.4))
       head.position.set(0, 2.02, 0)
     } else {
-      head.position.set(0, 0.4, 0)
+      head.position.set(0, 0.53, 0)
     }
     head.userData.phase = ctx.rand() * 10
     g.add(head)
@@ -489,12 +490,12 @@ registerProp('paper_lantern', {
       body.position.set(0, 2.5, 0)
     } else {
       const glow = glowMat(color, 2.4)
-      body.add(ball(0.2, 0.24, 0.2, glow, 0, 0, 0, 16))
-      for (const [y, rr] of [[0, 0.205], [0.12, 0.178], [-0.12, 0.178]] as const) body.add(ring(rr, 0.01, dark, 0, y, 0, 4, 20))
-      body.add(cy(0.09, 0.11, 0.05, dark, 0, 0.21, 0, 12))
-      body.add(cy(0.11, 0.09, 0.05, dark, 0, -0.26, 0, 12))
-      body.add(cn(0.035, 0.12, M(PAL.gold), 0, -0.38, 0, 6).rotateX(Math.PI))
-      body.add(rod([0, 0.26, 0], [0, 0.45, 0], 0.006, 0.006, dark, 4))
+      body.add(ball(0.24, 0.29, 0.24, glow, 0, 0, 0, 16))
+      for (const [y, rr] of [[0, 0.245], [0.14, 0.214], [-0.14, 0.214]] as const) body.add(ring(rr, 0.012, dark, 0, y, 0, 4, 20))
+      body.add(cy(0.1, 0.13, 0.06, dark, 0, 0.255, 0, 12))
+      body.add(cy(0.13, 0.1, 0.06, dark, 0, -0.315, 0, 12))
+      body.add(cn(0.04, 0.14, M(PAL.gold), 0, -0.47, 0, 6).rotateX(Math.PI))
+      body.add(rod([0, 0.31, 0], [0, 0.45, 0], 0.008, 0.008, dark, 4))
       if (pole) {
         const bamboo = M('#b9a35a')
         g.add(cy(0.028, 0.034, 2.05, bamboo, 0, 0, 0, 8))
@@ -601,7 +602,7 @@ registerProp('campfire', {
 
 registerProp('torch', {
   solid: false,
-  light: (ctx) => ({ color: '#ff9a4a', intensity: 2.2, distance: 5.5, y: bool(ctx, 'standing') ? 1.5 : 1.95, flicker: true }),
+  light: (ctx) => ({ color: '#ff9a4a', intensity: 1.8, distance: 5.5, y: bool(ctx, 'standing') ? 1.5 : 1.95, flicker: true }),
   build: (ctx) => {
     const standing = bool(ctx, 'standing')
     const g = new THREE.Group()
@@ -856,17 +857,17 @@ registerProp('sign', {
         const wood = M('#4a3a30')
         g.add(rot(bx(0.1, 1.6, 0.1, wood, 0, 0, -0.02), 0.03, 0, -0.04))
         g.add(rot(bx(0.08, 0.36, 0.06, wood, 0, 1.1, 0.0), 0, 0, 0.9))
-        const disc = cy(0.31, 0.31, 0.05, M('#e9e2d2'), 0, 0, 0, 28)
+        const disc = cy(0.37, 0.37, 0.05, M('#e9e2d2'), 0, 0, 0, 28)
         disc.rotation.x = Math.PI / 2
-        disc.position.set(0, 1.36, 0.06)
+        disc.position.set(0, 1.4, 0.06)
         g.add(disc)
         const face = new THREE.Mesh(cachedGeo('circle', () => new THREE.CircleGeometry(0.5, 40)), texMat('kitsune-face', faceTex()))
-        face.scale.setScalar(0.58)
-        face.position.set(0, 1.36, 0.0865)
+        face.scale.setScalar(0.7)
+        face.position.set(0, 1.4, 0.0865)
         g.add(face)
-        g.add(torus(0.31, 0.018, M('#8a2a2a'), 0, 1.36, 0.06, 6, 28))
-        for (const x of [-0.18, 0.18]) g.add(ball(0.018, 0.018, 0.01, M(PAL.iron), x, 1.58, 0.09, 6))
-        g.add(rod([0.02, 1.6, 0.06], [0.12, 1.25, 0.08], 0.012, 0.012, M('#d84a3a'), 4))
+        g.add(torus(0.37, 0.02, M('#8a2a2a'), 0, 1.4, 0.06, 6, 28))
+        for (const x of [-0.2, 0.2]) g.add(ball(0.02, 0.02, 0.012, M(PAL.iron), x, 1.66, 0.09, 6))
+        g.add(rod([0.02, 1.74, 0.06], [0.14, 1.3, 0.08], 0.014, 0.014, M('#d84a3a'), 4))
         return g
       }),
       (ctx.rand() - 0.5) * 0.3,
@@ -899,19 +900,20 @@ registerProp('signpost', {
       const wood = M(PAL.woodDark)
       g.add(bx(0.11, 1.9, 0.11, wood))
       g.add(rot(cn(0.1, 0.12, wood, 0, 1.9, 0, 4), 0, Math.PI / 4, 0))
-      const boardCols = [PAL.woodPale, PAL.woodLight, '#c99a62']
+      const boardCols = ['#e8c48a', PAL.woodPale, '#d9a868']
       for (let i = 0; i < 3; i++) {
-        const board = extrude('arrow', arrowShape, 0.035, M(boardCols[i]))
+        const board = extrude('arrow', arrowShape, 0.045, M(boardCols[i]))
         const a = (r() - 0.5) * 2.2 + (i % 2 ? Math.PI : 0)
-        board.position.set(0, 1.62 - i * 0.26, 0)
+        board.scale.set(1.35, 1.5, 1)
+        board.position.set(0, 1.6 - i * 0.32, 0)
         board.rotation.y = a
-        board.translateX(-0.06)
+        board.translateX(-0.08)
         g.add(board)
-        const text = bx(0.34, 0.025, 0.04, M('#4a3020'), 0, 0, 0)
+        const text = bx(0.46, 0.03, 0.05, M('#5a3a24'), 0, 0, 0)
         text.position.copy(board.position)
         text.rotation.copy(board.rotation)
-        text.translateX(0.28)
-        text.translateY(-0.012)
+        text.translateX(0.37)
+        text.translateY(-0.015)
         g.add(text)
       }
       return g
@@ -1031,7 +1033,7 @@ registerProp('well', {
 
 registerProp('fountain', {
   solid: true,
-  light: (ctx) => (bool(ctx, 'glow') ? { color: PAL.bio, intensity: 1.4, distance: 4.5, y: 0.6 } : null),
+  light: (ctx) => (bool(ctx, 'glow') ? { color: PAL.bio, intensity: 1.0, distance: 4.5, y: 1.1 } : null),
   build: (ctx) => {
     const glow = bool(ctx, 'glow')
     const style = stoneStyle(ctx)
@@ -1039,7 +1041,7 @@ registerProp('fountain', {
     const m = stoneMats(style, optColor(ctx))
     g.add(lathe('basin', [[0.49, 0], [0.5, 0.3], [0.47, 0.36], [0.42, 0.36], [0.42, 0.12]], m.base, 24))
     g.add(cy(0.5, 0.5, 0.05, m.shade, 0, 0, 0, 24))
-    const waterMat = glow ? M('#2fb8b0', { emissive: PAL.bio, ei: 0.9 }) : M('#3f9ac0', { emissive: '#1d5f80', ei: 0.35 })
+    const waterMat = glow ? M('#2a9a96', { emissive: PAL.bio, ei: 0.5 }) : M('#3f9ac0', { emissive: '#1d5f80', ei: 0.35 })
     const water = cy(0.42, 0.42, 0.02, waterMat, 0, 0.27, 0, 24)
     fx(water)
     g.add(water)
@@ -1055,7 +1057,9 @@ registerProp('fountain', {
     const jet = cn(0.035, 0.28, M('#e6f8ff', { opacity: 0.55 }), 0, 0.88, 0, 8)
     fx(jet)
     g.add(jet)
-    const rip = ring(0.2, 0.008, glow ? glowMat(PAL.bio, 2) : M('#e6f8ff', { opacity: 0.6 }), 0, 0.29, 0, 4, 32)
+    const rip = new THREE.Group()
+    rip.position.y = 0.29
+    rip.add(ring(0.12, 0.006, glow ? glowMat(PAL.bio, 2) : M('#e6f8ff', { opacity: 0.6 }), 0, 0, 0, 4, 32))
     fx(rip)
     keep(rip)
     g.add(rip)
@@ -1066,7 +1070,7 @@ registerProp('fountain', {
     const r = obj.userData.ripple as THREE.Object3D | undefined
     if (!r) return
     const k = (t * 0.5) % 1
-    r.scale.setScalar(1 + k * 0.9)
+    r.scale.setScalar(0.6 + k * 2.4)
   },
 })
 
@@ -1383,8 +1387,8 @@ registerProp('waterwheel', {
   ],
   build: () => {
     const g = new THREE.Group()
-    const wood = M(PAL.wood)
-    const dark = M(PAL.woodDark)
+    const wood = M(PAL.woodLight)
+    const dark = M(PAL.wood)
     const wheel = new THREE.Group()
     const R = 0.95
     for (const x of [-0.2, 0.2]) {

@@ -34,7 +34,7 @@ export class CameraRig {
   maxZoom = 1.8
 
   constructor() {
-    this.camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 400)
+    this.camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 600)
     this.camera.layers.enable(FX_LAYER)
     this.dir = new THREE.Vector3(
       Math.cos(this.pitch) * Math.sin(this.yaw),
@@ -172,7 +172,7 @@ export class CameraRig {
   }
 
   private apply(): void {
-    const dist = 60
+    const dist = 100
     this.camera.position.copy(this.target).addScaledVector(this.dir, dist)
     this.camera.lookAt(this.target)
   }

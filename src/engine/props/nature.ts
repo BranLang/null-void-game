@@ -110,7 +110,7 @@ registerProp('tree', {
     const leafCol = tint(ctx, bio ? PAL.bioLeaf : PAL.leaf, 'canopy')
     const v = variant(ctx, 4)
     const inner = cachedBuild(`tree|${leafCol}|${bio}|${v}`, () => buildTree(seeded('tree' + v), leafCol, bio))
-    return wrap(inner, ctx.rand() * Math.PI * 2, size * (0.9 + ctx.rand() * 0.2))
+    return wrap(inner, ctx.rand() * Math.PI * 2, size * 1.15 * (0.9 + ctx.rand() * 0.2))
   },
 })
 
@@ -188,8 +188,13 @@ registerProp('temple_tree', {
       g.add(chain([[0.05, 2.8, 0], [ca * 0.95, 3.6, sa * 0.95], end], 0.25, 0.1, bark, 9))
       const s = 1.05 + r() * 0.25
       const c: V3 = [end[0], end[1] + 0.25, end[2]]
-      g.add(ball(s, s * 0.68, s, canopy[i % 2], c[0], c[1], c[2], 18))
-      blobs.push({ c, rx: s, ry: s * 0.68, rz: s })
+      g.add(ball(s, s * 0.6, s, canopy[i % 2], c[0], c[1], c[2], 18))
+      for (let k = 0; k < 2; k++) {
+        const b = a + (k ? 0.8 : -0.8)
+        const ss = s * (0.45 + r() * 0.12)
+        g.add(ball(ss, ss * 0.62, ss, canopy[(i + k + 1) % 3], c[0] + Math.cos(b) * s * 0.72, c[1] + s * 0.24, c[2] + Math.sin(b) * s * 0.72, 14))
+      }
+      blobs.push({ c, rx: s, ry: s * 0.6, rz: s })
     }
     const topC: V3 = [0, 4.95, 0]
     g.add(ball(1.35, 0.85, 1.3, canopy[2], topC[0], topC[1], topC[2], 20))
@@ -298,19 +303,20 @@ registerProp('deadtree', {
       const g = new THREE.Group()
       const bark = M(col)
       const lean = (r() - 0.5) * 0.4
-      g.add(chain([[0, -0.05, 0], [lean * 0.3, 0.8, 0.05], [lean, 1.6, -0.05], [lean * 1.2, 2.1, 0.05]], 0.15, 0.05, bark, 8))
-      for (let i = 0; i < 3; i++) {
-        const a = (i / 3) * Math.PI * 2 + r()
-        g.add(rod([0, 0.22, 0], [Math.cos(a) * 0.32, -0.03, Math.sin(a) * 0.32], 0.08, 0.03, bark, 6))
+      g.add(chain([[0, -0.05, 0], [lean * 0.3, 0.9, 0.05], [lean, 1.85, -0.05], [lean * 1.2, 2.5, 0.05]], 0.21, 0.06, bark, 9))
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2 + r()
+        g.add(rod([0, 0.28, 0], [Math.cos(a) * 0.4, -0.03, Math.sin(a) * 0.4], 0.11, 0.035, bark, 7))
       }
       for (let i = 0; i < 5; i++) {
         const t = 0.35 + i * 0.13
-        const a = r() * Math.PI * 2
-        const s: V3 = [lean * t, 0.6 + t * 1.3, 0]
-        const e: V3 = [s[0] + Math.cos(a) * (0.55 - i * 0.05), s[1] + 0.35 + r() * 0.2, s[2] + Math.sin(a) * (0.55 - i * 0.05)]
-        g.add(rod(s, e, 0.05 - i * 0.005, 0.018, bark, 6))
+        const a = (i / 5) * Math.PI * 2 + r() * 0.8
+        const s: V3 = [lean * t, 0.7 + t * 1.5, 0]
+        const len = 0.7 - i * 0.06
+        const e: V3 = [s[0] + Math.cos(a) * len, s[1] + 0.4 + r() * 0.25, s[2] + Math.sin(a) * len]
+        g.add(rod(s, e, 0.075 - i * 0.008, 0.025, bark, 7))
         const b = a + (r() > 0.5 ? 0.8 : -0.8)
-        g.add(rod(e, [e[0] + Math.cos(b) * 0.22, e[1] + 0.18, e[2] + Math.sin(b) * 0.22], 0.018, 0.006, bark, 5))
+        g.add(rod(e, [e[0] + Math.cos(b) * 0.28, e[1] + 0.22, e[2] + Math.sin(b) * 0.28], 0.025, 0.008, bark, 5))
       }
       return g
     })
@@ -350,8 +356,8 @@ registerProp('bush', {
           const b = blobs[i % n]
           const p = onBlob(r, b.c, b.s, b.s * 0.85, b.s, 0.98)
           if (p[1] < 0.15) continue
-          g.add(ball(0.05, 0.035, 0.05, fm, p[0], p[1], p[2], 8))
-          g.add(ball(0.02, 0.02, 0.02, fc, p[0], p[1] + 0.025, p[2], 4))
+          g.add(ball(0.07, 0.045, 0.07, fm, p[0], p[1], p[2], 8))
+          g.add(ball(0.028, 0.025, 0.028, fc, p[0], p[1] + 0.03, p[2], 4))
         }
       }
       return g
@@ -381,19 +387,19 @@ registerProp('flowers', {
       const leafM = M(PAL.leaf)
       const heads = glow ? [glowMat('#eef8ff', 3), glowMat('#7fc8ff', 3)] : [M(col || pick(r, FLOWER_COLS)), M(col ? shade(col, 1.15) : pick(r, FLOWER_COLS))]
       const centre = glow ? glowMat('#ffffff', 3.4) : M(PAL.gold)
-      const n = 6 + Math.floor(r() * 3)
+      const n = 7 + Math.floor(r() * 4)
       for (let i = 0; i < n; i++) {
         const a = r() * Math.PI * 2
-        const d = Math.sqrt(r()) * 0.32
+        const d = Math.sqrt(r()) * 0.34
         const x = Math.cos(a) * d
         const z = Math.sin(a) * d
-        const h = 0.16 + r() * 0.18
-        const tx = x + (r() - 0.5) * 0.06
-        const tz = z + (r() - 0.5) * 0.06
-        g.add(rod([x, 0, z], [tx, h, tz], 0.012, 0.01, stem, 4))
-        g.add(ball(0.055, 0.035, 0.055, heads[i % 2], tx, h + 0.01, tz, 8))
-        g.add(ball(0.022, 0.018, 0.022, centre, tx, h + 0.035, tz, 6))
-        if (i % 2 === 0) g.add(leaf([x, 0, z], [x + Math.cos(a + 1) * 0.12, 0.09, z + Math.sin(a + 1) * 0.12], 0.06, 0.015, leafM))
+        const h = 0.2 + r() * 0.2
+        const tx = x + (r() - 0.5) * 0.08
+        const tz = z + (r() - 0.5) * 0.08
+        g.add(rod([x, 0, z], [tx, h, tz], 0.014, 0.011, stem, 4))
+        g.add(ball(0.075, 0.045, 0.075, heads[i % 2], tx, h + 0.01, tz, 10))
+        g.add(ball(0.03, 0.024, 0.03, centre, tx, h + 0.045, tz, 6))
+        if (i % 2 === 0) g.add(leaf([x, 0, z], [x + Math.cos(a + 1) * 0.15, 0.11, z + Math.sin(a + 1) * 0.15], 0.08, 0.018, leafM))
       }
       return g
     })
@@ -415,15 +421,15 @@ registerProp('grass', {
       const r = seeded('grass' + v)
       const g = new THREE.Group()
       const mats = [M(col), M(shade(col, 0.78)), M(shade(col, 1.2))]
-      const n = 7 + Math.floor(r() * 4)
+      const n = 9 + Math.floor(r() * 5)
       for (let i = 0; i < n; i++) {
         const a = r() * Math.PI * 2
-        const d = r() * 0.14
+        const d = r() * 0.17
         const x = Math.cos(a) * d
         const z = Math.sin(a) * d
-        const h = 0.22 + r() * 0.24
-        const out = 0.08 + r() * 0.1
-        g.add(leaf([x, -0.02, z], [x + Math.cos(a) * out, h, z + Math.sin(a) * out], 0.07, 0.018, mats[i % 3]))
+        const h = 0.3 + r() * 0.3
+        const out = 0.1 + r() * 0.12
+        g.add(leaf([x, -0.02, z], [x + Math.cos(a) * out, h, z + Math.sin(a) * out], 0.085, 0.02, mats[i % 3]))
       }
       return g
     })
@@ -472,7 +478,7 @@ registerProp('reeds', {
 registerProp('rock', {
   solid: true,
   build: (ctx) => {
-    const col = tint(ctx, PAL.stone)
+    const col = tint(ctx, '#9a9284')
     const v = variant(ctx, 4)
     const moss = bool(ctx, 'moss', v === 1)
     const inner = cachedBuild(`rock|${col}|${moss}|${v}`, () => {
@@ -480,10 +486,10 @@ registerProp('rock', {
       const g = new THREE.Group()
       const m = F(col)
       const m2 = F(shade(col, 0.85))
-      g.add(rock(v, 0.34, 0.3, 0.3, m, 0, 0, 0))
-      g.add(rock(v + 2, 0.15, 0.13, 0.13, m2, 0.3, 0, 0.18))
-      if (r() > 0.4) g.add(rock(v + 3, 0.1, 0.08, 0.09, m, -0.28, 0, 0.22))
-      if (moss) g.add(ball(0.24, 0.07, 0.2, M(PAL.moss), 0.02, 0.38, -0.02, 10))
+      g.add(rock(v, 0.42, 0.36, 0.38, m, 0, 0, 0))
+      g.add(rock(v + 2, 0.18, 0.15, 0.16, m2, 0.36, 0, 0.2))
+      if (r() > 0.4) g.add(rock(v + 3, 0.12, 0.1, 0.11, m, -0.34, 0, 0.24))
+      if (moss) g.add(ball(0.28, 0.08, 0.24, M(PAL.moss), 0.02, 0.47, -0.02, 12))
       return g
     })
     return wrap(inner, ctx.rand() * Math.PI * 2, num(ctx, 'size', 1))
@@ -493,7 +499,7 @@ registerProp('rock', {
 registerProp('boulder', {
   solid: true,
   build: (ctx) => {
-    const col = tint(ctx, PAL.stone)
+    const col = tint(ctx, '#9a9284')
     const v = variant(ctx, 3)
     const moss = bool(ctx, 'moss', v !== 2)
     const inner = cachedBuild(`boulder|${col}|${moss}|${v}`, () => {
@@ -603,7 +609,7 @@ registerProp('roots', {
 
 registerProp('mushroom', {
   solid: false,
-  light: (ctx) => (bool(ctx, 'glow', true) ? { color: tint(ctx, '#58d6ff'), intensity: 1, distance: 2.8, y: 0.35 } : null),
+  light: (ctx) => (bool(ctx, 'glow', true) ? { color: tint(ctx, '#58d6ff'), intensity: 0.7, distance: 3.2, y: 1.0 } : null),
   build: (ctx) => {
     const glow = bool(ctx, 'glow', true)
     const col = tint(ctx, glow ? '#58d6ff' : '#d0503a')
@@ -612,14 +618,14 @@ registerProp('mushroom', {
       const r = seeded('mush' + v)
       const g = new THREE.Group()
       const stem = M('#efe4cc')
-      const cap = glow ? M(col, { emissive: col, ei: 1.6 }) : M(col)
+      const cap = glow ? M(col, { emissive: col, ei: 0.7 }) : M(col)
       const gill = M(glow ? shade(col, 0.6) : '#e8d8bc')
       const spot = glow ? glowMat('#ffffff', 2.6) : M('#fff6e6')
       const n = 3 + Math.floor(r() * 3)
       for (let i = 0; i < n; i++) {
         const a = (i / n) * Math.PI * 2 + r()
-        const d = i === 0 ? 0 : 0.12 + r() * 0.12
-        const h = (i === 0 ? 0.3 : 0.12 + r() * 0.14) * (glow ? 1 : 0.9)
+        const d = i === 0 ? 0 : 0.17 + r() * 0.13
+        const h = (i === 0 ? 0.44 : 0.16 + r() * 0.18) * (glow ? 1 : 0.9)
         const cr = h * 0.55 + 0.03
         const x = Math.cos(a) * d
         const z = Math.sin(a) * d
@@ -736,7 +742,14 @@ registerProp('jungle_tree', {
         const d = i === 0 ? 0 : 1.4 + r() * 0.5
         const s = i === 0 ? 1.6 : 1.05 + r() * 0.35
         const c: V3 = [lean + Math.cos(a) * d, 5.6 + (i === 0 ? 0.55 : r() * 0.5 - 0.1), Math.sin(a) * d]
-        g.add(ball(s, s * 0.62, s, greens[i === 0 ? 2 : i % 2], c[0], c[1], c[2], 18))
+        const m = greens[i === 0 ? 2 : i % 2]
+        g.add(ball(s, s * 0.5, s * 0.92, m, c[0], c[1], c[2], 18))
+        // sub-clumps break the round silhouette
+        for (let k = 0; k < 2; k++) {
+          const b = a + (k ? 0.9 : -0.9) + r() * 0.4
+          const ss = s * (0.42 + r() * 0.15)
+          g.add(ball(ss, ss * 0.6, ss, i === 0 ? greens[2] : greens[(i + k) % 2], c[0] + Math.cos(b) * s * 0.7, c[1] + s * 0.28, c[2] + Math.sin(b) * s * 0.7, 14))
+        }
         blobs.push({ c, s })
       }
       // lianas hanging from the crown
@@ -765,7 +778,7 @@ registerProp('jungle_tree', {
 
 registerProp('lily', {
   solid: false,
-  light: (ctx) => ({ color: tint(ctx, '#ffc8e8'), intensity: 0.8, distance: 2.4, y: LIQUID_SURFACE + 0.25 }),
+  light: (ctx) => ({ color: tint(ctx, '#ffc8e8'), intensity: 0.55, distance: 2.4, y: LIQUID_SURFACE + 0.6 }),
   build: (ctx) => {
     const col = tint(ctx, '#ffc8e8')
     const v = variant(ctx, 4)
@@ -779,8 +792,8 @@ registerProp('lily', {
       const spots: V3[] = []
       for (let i = 0; i < n; i++) {
         const a = r() * Math.PI * 2
-        const d = i === 0 ? 0 : 0.22 + r() * 0.14
-        const s = i === 0 ? 0.26 : 0.14 + r() * 0.1
+        const d = i === 0 ? 0 : 0.3 + r() * 0.12
+        const s = i === 0 ? 0.34 : 0.18 + r() * 0.12
         const pad = new THREE.Mesh(padGeo, pads[i % 3])
         pad.scale.set(s, 0.015, s)
         pad.position.set(Math.cos(a) * d, y, Math.sin(a) * d)
@@ -789,20 +802,20 @@ registerProp('lily', {
         g.add(pad)
         spots.push([pad.position.x, y, pad.position.z])
       }
-      const petal = M(col, { emissive: col, ei: 1.5 })
-      const core = glowMat('#fff2a0', 3)
+      const petal = M(col, { emissive: col, ei: 0.75 })
+      const core = glowMat('#fff2a0', 2.6)
       for (let f = 0; f < (r() > 0.5 ? 2 : 1); f++) {
         const s = spots[f]
         const c: V3 = [s[0] + 0.03, s[1] + 0.02, s[2] - 0.02]
         for (let i = 0; i < 7; i++) {
           const a = (i / 7) * Math.PI * 2
-          g.add(leaf(c, [c[0] + Math.cos(a) * 0.13, c[1] + 0.09, c[2] + Math.sin(a) * 0.13], 0.075, 0.025, petal))
+          g.add(leaf(c, [c[0] + Math.cos(a) * 0.18, c[1] + 0.11, c[2] + Math.sin(a) * 0.18], 0.1, 0.03, petal))
         }
         for (let i = 0; i < 5; i++) {
           const a = (i / 5) * Math.PI * 2 + 0.3
-          g.add(leaf(c, [c[0] + Math.cos(a) * 0.06, c[1] + 0.12, c[2] + Math.sin(a) * 0.06], 0.06, 0.02, petal))
+          g.add(leaf(c, [c[0] + Math.cos(a) * 0.08, c[1] + 0.16, c[2] + Math.sin(a) * 0.08], 0.08, 0.025, petal))
         }
-        g.add(ball(0.035, 0.03, 0.035, core, c[0], c[1] + 0.06, c[2], 6))
+        g.add(ball(0.045, 0.04, 0.045, core, c[0], c[1] + 0.08, c[2], 6))
       }
       return g
     })
