@@ -342,16 +342,31 @@ function buildChrono(): HTMLCanvasElement {
   c.height = Math.round(H * r)
   const g = c.getContext('2d')!
   g.scale(r, r)
-  // chain
-  g.strokeStyle = '#a07a3a'
-  g.lineWidth = 2
-  for (let k = 0; k < 14; k++) {
-    const t = k / 13
-    const x = CHX - t * 150 + Math.sin(t * 3) * 12
-    const y = CHY - CHR - 34 - Math.sin(t * Math.PI) * 30 - t * 30
-    g.beginPath()
-    g.ellipse(x, y, 5, 3, t * 1.2 + (k % 2) * 1.3, 0, TAU)
-    g.stroke()
+  // chain: links along a sagging curve from the bow to the corner
+  {
+    const p0 = { x: CHX, y: CHY - CHR - 37 }
+    const c0 = { x: CHX - 70, y: CHY - CHR + 10 }
+    const p1 = { x: -8, y: 18 }
+    const at = (t: number) => ({
+      x: (1 - t) * (1 - t) * p0.x + 2 * (1 - t) * t * c0.x + t * t * p1.x,
+      y: (1 - t) * (1 - t) * p0.y + 2 * (1 - t) * t * c0.y + t * t * p1.y,
+    })
+    const N = 30
+    for (let k = 0; k < N; k++) {
+      const a = at(k / N)
+      const b = at((k + 1) / N)
+      const ang = Math.atan2(b.y - a.y, b.x - a.x)
+      const mx = (a.x + b.x) / 2
+      const my = (a.y + b.y) / 2
+      g.strokeStyle = k % 2 ? '#8a6428' : '#c9a052'
+      g.lineWidth = k % 2 ? 1.6 : 2
+      g.beginPath()
+      if (k % 2) {
+        g.moveTo(mx - Math.cos(ang) * 4, my - Math.sin(ang) * 4)
+        g.lineTo(mx + Math.cos(ang) * 4, my + Math.sin(ang) * 4)
+      } else g.ellipse(mx, my, 5, 2.8, ang, 0, TAU)
+      g.stroke()
+    }
   }
   // bow + crown
   g.strokeStyle = '#d8b46a'
@@ -521,17 +536,19 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
     }
 
     const card = createCard(ctx, S.title, S.sub)
+    card.card.style.width = 'min(880px, 94vw)'
     card.hint.textContent = ctx.t(S.hint)
     card.buttons.style.minHeight = '42px'
     const { canvas, ctx: g } = hiDpiCanvas(W, H)
     canvas.style.touchAction = 'none'
     canvas.style.display = 'block'
+    canvas.style.margin = '0 auto'
     const fit = () => {
-      const s = Math.min(1, (window.innerWidth * 0.94 - 60) / W, (window.innerHeight * 0.92 - 300) / H)
+      const reserve = 262 + (note.style.display === 'block' ? note.offsetHeight + 12 : 0)
+      const s = Math.min(1, (window.innerWidth * 0.94 - 60) / W, (window.innerHeight * 0.92 - reserve) / H)
       canvas.style.width = `${Math.round(W * Math.max(0.4, s))}px`
       canvas.style.height = `${Math.round(H * Math.max(0.4, s))}px`
     }
-    fit()
     window.addEventListener('resize', fit)
     cleanups.push(() => window.removeEventListener('resize', fit))
     card.body.appendChild(canvas)
@@ -540,6 +557,7 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       'max-width:760px;margin:2px auto 0;font-family:var(--nv-font-body);font-style:italic;font-size:calc(16px * var(--nv-text-scale));' +
       'color:var(--nv-text);border-left:2px solid var(--nv-gold);padding:6px 12px;background:rgba(40,30,18,.45);border-radius:4px;display:none;line-height:1.35'
     card.body.appendChild(note)
+    fit()
 
     const bg = buildBackground()
     const wallArt = buildWallClock()
@@ -562,6 +580,7 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
     let ribbon = 0
     let glow = 0
     let lastTickMin = Math.round(initial / 5)
+    const sparks: { x: number; y: number; vx: number; vy: number; life: number }[] = []
 
     function wrapMin(d: number): number {
       const r = mod(d + 360, 720) - 360
@@ -617,6 +636,13 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       if (diff <= TOL_MIN) {
         mode = 'running'
         runT = 0
+        if (!reduced) {
+          for (let k = 0; k < 70; k++) {
+            const a = Math.random() * TAU
+            const sp = 40 + Math.random() * 120
+            sparks.push({ x: WCX + Math.cos(a) * WCR, y: WCY + Math.sin(a) * WCR, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 30, life: 0.8 + Math.random() * 1.2 })
+          }
+        }
         pend = { amp: 0.34, phase: 0, decay: 0 }
         hintBtn.disabled = true
         swingBtn.disabled = true
@@ -787,14 +813,14 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
 
     function drawRibbon(a: number): void {
       if (a <= 0) return
-      const x0 = 40
-      const x1 = 340
-      const y = 402
+      const x0 = 46
+      const x1 = 300
+      const y = 420
       g.save()
       g.globalAlpha = a
       g.fillStyle = 'rgba(10,8,6,0.55)'
       g.beginPath()
-      rrPath(g, x0 - 14, y - 34, x1 - x0 + 28, 66, 8)
+      rrPath(g, x0 - 16, y - 32, x1 - x0 + 66, 66, 8)
       g.fill()
       g.strokeStyle = 'rgba(214,178,106,0.4)'
       g.lineWidth = 1
@@ -832,12 +858,11 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       g.textAlign = 'left'
       g.font = 'italic 11px "EB Garamond", serif'
       g.fillStyle = 'rgba(236,228,212,0.7)'
-      g.fillText('21 h', x1 + 2, y - 14)
-      g.fillText('24 h', x1 + 2, y + 22)
-      g.textAlign = 'center'
-      g.font = '600 9px Cinzel, serif'
-      g.fillStyle = 'rgba(236,228,212,0.55)'
-      g.fillText(ctx.t(S.dayRibbon).toUpperCase(), (x0 + x1) / 2, y - 28)
+      g.fillText('21 h', x1 + 14, y - 8)
+      g.fillText('24 h', x1 + 14, y + 14)
+      g.font = '600 8px Cinzel, serif'
+      g.fillStyle = 'rgba(236,228,212,0.5)'
+      g.fillText(ctx.t(S.dayRibbon).toUpperCase(), x1 + 14, y + 3)
       if (hints >= 2) {
         const fx = x0 + (x1 - x0) * (ahilMin / 1260)
         g.fillStyle = '#5ff2e0'
@@ -903,14 +928,39 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       }
 
       // ---------------- wall clock
-      if (glow > 0) {
-        const halo = g.createRadialGradient(WCX, WCY, WCR * 0.6, WCX, WCY, WCR + 90)
-        halo.addColorStop(0, `rgba(255,214,140,${0.18 * glow})`)
-        halo.addColorStop(1, 'rgba(255,214,140,0)')
-        g.fillStyle = halo
-        g.fillRect(WCX - WCR - 100, WCY - WCR - 100, (WCR + 100) * 2, (WCR + 100) * 2)
-      }
       g.drawImage(wallArt, 0, 0, W, H)
+      if (glow > 0) {
+        const beat = 1 - Math.min(1, (runT % 1) * 3)
+        g.save()
+        g.globalCompositeOperation = 'lighter'
+        const halo = g.createRadialGradient(WCX, WCY, WCR - 6, WCX, WCY, WCR + 70)
+        halo.addColorStop(0, `rgba(255,206,120,${(0.32 + 0.18 * beat) * glow})`)
+        halo.addColorStop(1, 'rgba(255,206,120,0)')
+        g.fillStyle = halo
+        g.beginPath()
+        g.arc(WCX, WCY, WCR + 70, 0, TAU)
+        g.arc(WCX, WCY, WCR - 6, 0, TAU, true)
+        g.fill()
+        g.fillStyle = `rgba(255,220,150,${0.07 * glow})`
+        g.beginPath()
+        g.arc(WCX, WCY, WCR, 0, TAU)
+        g.fill()
+        g.restore()
+      }
+      // golden sparks when the clock comes alive
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const p = sparks[i]
+        p.life -= dt
+        if (p.life <= 0) {
+          sparks.splice(i, 1)
+          continue
+        }
+        p.x += p.vx * dt
+        p.y += p.vy * dt
+        p.vy += 30 * dt
+        g.fillStyle = `rgba(255,224,150,${Math.min(1, p.life * 1.5)})`
+        g.fillRect(p.x, p.y, 2, 2)
+      }
       // pendulum
       const pivotY = WCY + WCR + 44
       const ang = pend.amp * Math.sin(pend.phase)
@@ -1025,14 +1075,14 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       g.font = '600 30px Cinzel, serif'
       g.shadowColor = 'rgba(243,217,149,0.45)'
       g.shadowBlur = 10
-      g.fillText(ahilStr, CHX, CHY + CHR + 44)
+      g.fillText(ahilStr, CHX, CHY + CHR + 40)
       g.shadowBlur = 0
       g.font = '600 12px Cinzel, serif'
       g.fillStyle = 'rgba(236,228,212,0.85)'
-      g.fillText(ctx.t(S.chrono).toUpperCase(), CHX, CHY + CHR + 70)
+      g.fillText(ctx.t(S.chrono).toUpperCase(), CHX, CHY + CHR + 63)
       g.font = 'italic 13px "EB Garamond", serif'
       g.fillStyle = 'rgba(236,228,212,0.6)'
-      g.fillText(ctx.t(S.chronoSub), CHX, CHY + CHR + 86)
+      g.fillText(ctx.t(S.chronoSub), CHX, CHY + CHR + 78)
       drawRibbon(ribbon)
     })
   })

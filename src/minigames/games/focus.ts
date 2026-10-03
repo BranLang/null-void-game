@@ -109,6 +109,7 @@ function glow(g: CanvasRenderingContext2D, x: number, y: number, r: number, c: R
   g.globalCompositeOperation = op
 }
 
+/** Keeps the canvas inside small windows (CSS scale only; drawing stays in W x H units). */
 function makeFitter(canvas: HTMLCanvasElement, card: HTMLElement, w: number, h: number): (force?: boolean) => void {
   let lw = -1
   let lh = -1
@@ -229,7 +230,8 @@ const SIDE_KEYS: Record<string, Side> = { ArrowLeft: 0, ArrowRight: 1, ArrowUp: 
 
 function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<MinigameResult> {
   const difficulty = params.difficulty === 2 || params.difficulty === 3 ? params.difficulty : 1
-  const thoughts = Array.isArray(params.thoughts) && params.thoughts.filter(isL).length ? params.thoughts.filter(isL) : DEFAULT_THOUGHTS
+  const custom = Array.isArray(params.thoughts) ? params.thoughts.filter(isL) : []
+  const thoughts = custom.length ? custom : DEFAULT_THOUGHTS
   const duration = typeof params.duration === 'number' && params.duration > 1 ? params.duration : 14
   const stakes = params.stakes === true
   const title = isL(params.title) ? params.title : TEXT.title
@@ -239,10 +241,11 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
   const travel = [7.5, 6.0, 4.8][difficulty - 1]
   const maxActive = [2, 3, 4][difficulty - 1]
   const timeLimit = duration * 4 + 20
+  const hintText = () => ctx.t(TEXT.hint) + (stakes ? ' ' + ctx.t(TEXT.stakesHint) : '')
 
   return new Promise<MinigameResult>((resolve) => {
     const card = createCard(ctx, title, subtitle)
-    card.hint.textContent = ctx.t(TEXT.hint) + (stakes ? ' ' + ctx.t(TEXT.stakesHint) : '')
+    card.hint.textContent = hintText()
     card.buttons.style.minHeight = '44px'
     const { canvas, ctx: g } = hiDpiCanvas(W, H)
     const dpr = canvas.width / W
@@ -277,31 +280,48 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       edgeSegs = []
       const r = mulberry32(77)
       const md = Math.min(edgeW, edgeH)
-      const grow = (x: number, y: number, ang: number, len: number, depth: number, dist: number) => {
-        const x1 = x + Math.cos(ang) * len
-        const y1 = y + Math.sin(ang) * len
-        const d1 = dist + len
-        edgeSegs.push(x, y, x1, y1, dist / md, Math.max(0.5, depth * 0.7))
-        if (depth <= 0) return
-        grow(x1, y1, ang + (r() - 0.5) * 0.6, len * (0.75 + r() * 0.2), depth - 1, d1)
-        if (r() < 0.75) grow(x1, y1, ang + (r() < 0.5 ? -1 : 1) * (0.6 + r() * 0.5), len * 0.6, depth - 1, d1)
+      // frost ferns: a slightly wandering stem with side branches at 60 degrees
+      const fern = (x: number, y: number, ang: number, len: number, w: number, dist: number, depth: number): void => {
+        const steps = Math.max(2, Math.round(len / 9))
+        const st = len / steps
+        let px = x
+        let py = y
+        let a = ang
+        for (let i = 0; i < steps; i++) {
+          a += (r() - 0.5) * 0.14
+          const nx = px + Math.cos(a) * st
+          const ny = py + Math.sin(a) * st
+          const d = dist + (i + 1) * st
+          edgeSegs.push(px, py, nx, ny, d / md, w)
+          if (depth > 0 && i % 2 === 1) {
+            const bl = len * 0.45 * (1 - i / steps) * (0.7 + r() * 0.5)
+            if (bl > 5) {
+              fern(nx, ny, a - Math.PI / 3, bl, w * 0.7, d, depth - 1)
+              fern(nx, ny, a + Math.PI / 3, bl, w * 0.7, d, depth - 1)
+            }
+          }
+          px = nx
+          py = ny
+        }
       }
-      const per = Math.round((edgeW + edgeH) / 38)
-      for (let i = 0; i < per; i++) {
+      const count = Math.round((edgeW + edgeH) / 22)
+      for (let i = 0; i < count; i++) {
         const t = r()
         const side = Math.floor(r() * 4)
-        const L0 = md * (0.035 + r() * 0.03)
-        if (side === 0) grow(t * edgeW, 0, Math.PI / 2 + (r() - 0.5) * 0.9, L0, 4, 0)
-        else if (side === 1) grow(t * edgeW, edgeH, -Math.PI / 2 + (r() - 0.5) * 0.9, L0, 4, 0)
-        else if (side === 2) grow(0, t * edgeH, (r() - 0.5) * 0.9, L0, 4, 0)
-        else grow(edgeW, t * edgeH, Math.PI + (r() - 0.5) * 0.9, L0, 4, 0)
+        const len = md * (0.05 + r() * 0.11)
+        const jit = (r() - 0.5) * 0.9
+        if (side === 0) fern(t * edgeW, -2, Math.PI / 2 + jit, len, 1.4, 0, 2)
+        else if (side === 1) fern(t * edgeW, edgeH + 2, -Math.PI / 2 + jit, len, 1.4, 0, 2)
+        else if (side === 2) fern(-2, t * edgeH, jit, len, 1.4, 0, 2)
+        else fern(edgeW + 2, t * edgeH, Math.PI + jit, len, 1.4, 0, 2)
       }
     }
     buildEdge()
 
-    // strain / focus meter (DOM, under the canvas)
+    // focus / strain meters (DOM, under the canvas) in stakes mode
     const meters = document.createElement('div')
-    meters.style.cssText = 'display:flex;gap:18px;justify-content:center;align-items:center;margin-top:10px;font-family:var(--nv-font-title);font-size:12px;letter-spacing:.14em;color:var(--nv-text-dim);text-transform:uppercase'
+    meters.style.cssText =
+      'display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:10px;font-family:var(--nv-font-title);font-size:12px;letter-spacing:.14em;color:var(--nv-text-dim);text-transform:uppercase'
     const mkMeter = (label: L, color: string) => {
       const wrap = document.createElement('div')
       wrap.style.cssText = 'display:flex;gap:8px;align-items:center'
@@ -316,9 +336,9 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       meters.appendChild(wrap)
       return fill
     }
-    const focusFill = mkMeter(TEXT.focus, 'var(--nv-frost)')
+    const focusFill = stakes ? mkMeter(TEXT.focus, 'var(--nv-frost)') : null
     const strainFill = stakes ? mkMeter(TEXT.strain, '#9fd0ff') : null
-    card.body.appendChild(meters)
+    if (stakes) card.body.appendChild(meters)
 
     const frostTex = makeFrostTexture(dpr)
 
@@ -364,8 +384,9 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
     function spawn(): void {
       const active = list.filter((t) => t.state === 'in').length
       if (active >= maxActive) return
-      let text = ctx.t(thoughts[Math.floor(Math.random() * thoughts.length)])
-      if (thoughts.length > 1 && text === lastText) text = ctx.t(thoughts[(thoughts.findIndex((t) => ctx.t(t) === text) + 1) % thoughts.length])
+      let idx = Math.floor(Math.random() * thoughts.length)
+      if (thoughts.length > 1 && ctx.t(thoughts[idx]) === lastText) idx = (idx + 1) % thoughts.length
+      const text = ctx.t(thoughts[idx])
       lastText = text
       // prefer a side that is free
       const busy = new Set(list.filter((t) => t.state === 'in').map((t) => t.side))
@@ -450,8 +471,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       card.hint.textContent = ctx.t(TEXT.done)
       card.hint.style.color = 'var(--nv-frost)'
       card.buttons.replaceChildren()
-      const b = button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score: Math.round(score * 100) / 100 }), true)
-      card.buttons.appendChild(b)
+      card.buttons.appendChild(button(ctx.t(UI_STRINGS.continue), () => finish({ success: true, score: Math.round(score * 100) / 100 }), true))
       fit(true)
     }
 
@@ -463,7 +483,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       spawnT = 1.6
       list.length = 0
       phase = 'play'
-      card.hint.textContent = ctx.t(TEXT.hint) + (stakes ? ' ' + ctx.t(TEXT.stakesHint) : '')
+      card.hint.textContent = hintText()
       card.hint.style.color = ''
       card.buttons.replaceChildren()
       ;(document.activeElement as HTMLElement | null)?.blur?.()
@@ -480,12 +500,12 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       if (phase !== 'play') return
       pointers.add(e.pointerId)
       const [x, y] = toLocal(e)
-      // flick the closest thought under the pointer (generous hit box for touch)
+      // flick the closest thought under the pointer (generous hit box, larger for touch)
+      const pad = e.pointerType === 'touch' ? 26 : 14
       let best: Thought | null = null
       let bd = Infinity
       for (const t of list) {
         if (t.state !== 'in') continue
-        const pad = e.pointerType === 'touch' ? 26 : 14
         if (Math.abs(x - t.x) < t.w / 2 + pad + 18 && Math.abs(y - t.y) < 18 + pad) {
           const d = Math.hypot(x - t.x, y - t.y)
           if (d < bd) {
@@ -503,12 +523,12 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
     ctx.root.addEventListener('pointercancel', release)
     canvas.addEventListener('contextmenu', (e) => e.preventDefault())
 
+    const pressFirstButton = () => card.buttons.querySelector('button')?.click()
     ctx.onKey((e) => {
       if (e.code === 'Space') {
         e.preventDefault()
         if (phase === 'won' && !e.repeat && wonT > 0.6) {
-          const b = card.buttons.querySelector('button')
-          b?.click()
+          pressFirstButton()
           return
         }
         spaceDown = true
@@ -516,7 +536,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       }
       if (e.code === 'Enter' && !e.repeat && ((phase === 'won' && wonT > 0.6) || phase === 'lost')) {
         e.preventDefault()
-        card.buttons.querySelector('button')?.click()
+        pressFirstButton()
         return
       }
       const side = SIDE_KEYS[e.code]
@@ -535,6 +555,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       }
       if (best) flick(best)
       else {
+        // a stray flick costs a little stillness
         misfires++
         progress = Math.max(0, progress - 0.03)
         warm = Math.max(warm, 0.25)
@@ -655,7 +676,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       g.ellipse(CX - R * 0.35, CY - R * 0.42, R * 0.42, R * 0.16, -0.5, 0, Math.PI * 2)
       g.fill()
       // frost
-      const rad = shown * R * 1.06
+      const rad = shown * R * 1.12
       if (rad > 1) {
         g.save()
         frostPath(rad)
@@ -704,7 +725,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       g.font = '600 13px Cinzel, serif'
       g.textAlign = 'center'
       g.textBaseline = 'middle'
-      g.fillText(`${Math.floor(shown * 100)} %`, CX, CY + pr + 20)
+      g.fillText(`${phase === 'won' ? 100 : Math.min(99, Math.floor(shown * 100))} %`, CX, CY + pr + 20)
     }
 
     function drawArrowKey(x: number, y: number, side: Side, a: number): void {
@@ -770,26 +791,35 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       const s = clamp01(strain)
       if (s <= 0.01) return
       const md = Math.min(edgeW, edgeH)
-      const reach = s * 0.42
-      const vg = eg.createRadialGradient(edgeW / 2, edgeH / 2, md * (0.62 - s * 0.25), edgeW / 2, edgeH / 2, Math.hypot(edgeW, edgeH) / 2)
+      const reach = s * 0.3
+      const vg = eg.createRadialGradient(edgeW / 2, edgeH / 2, md * (0.6 - s * 0.22), edgeW / 2, edgeH / 2, Math.hypot(edgeW, edgeH) / 2)
       vg.addColorStop(0, 'rgba(200,230,255,0)')
-      vg.addColorStop(1, `rgba(210,236,255,${0.12 + s * 0.45})`)
+      vg.addColorStop(1, `rgba(214,238,255,${0.1 + s * 0.42})`)
       eg.fillStyle = vg
       eg.fillRect(0, 0, edgeW, edgeH)
       eg.lineCap = 'round'
-      eg.strokeStyle = `rgba(235,247,255,${0.35 + s * 0.5})`
-      for (let i = 0; i < edgeSegs.length; i += 6) {
-        if (edgeSegs[i + 4] > reach) continue
-        eg.lineWidth = edgeSegs[i + 5]
+      // three width buckets, one path each
+      for (const [lo, hi, a] of [
+        [1.2, 9, 0.75],
+        [0.85, 1.2, 0.6],
+        [0, 0.85, 0.45],
+      ] as const) {
+        eg.strokeStyle = `rgba(232,246,255,${a * (0.45 + s * 0.55)})`
+        eg.lineWidth = lo > 1 ? 1.4 : lo > 0.5 ? 1 : 0.7
         eg.beginPath()
-        eg.moveTo(edgeSegs[i], edgeSegs[i + 1])
-        eg.lineTo(edgeSegs[i + 2], edgeSegs[i + 3])
+        for (let i = 0; i < edgeSegs.length; i += 6) {
+          const w = edgeSegs[i + 5]
+          if (w < lo || w >= hi || edgeSegs[i + 4] > reach) continue
+          eg.moveTo(edgeSegs[i], edgeSegs[i + 1])
+          eg.lineTo(edgeSegs[i + 2], edgeSegs[i + 3])
+        }
         eg.stroke()
       }
     }
 
     // ------------------------------------------------------------------ loop
-    ctx.loop((dt, time) => {
+    ctx.loop((rawDt, time) => {
+      const dt = Math.max(0, rawDt)
       fit()
       const hold = holding()
       calm += ((hold ? 1 : 0) - calm) * Math.min(1, dt * 3)
@@ -820,6 +850,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       } else if (phase === 'won') {
         wonT += dt
         progress = 1
+        shown = Math.min(1, shown + dt * 2)
       } else if (stakes) {
         strain = Math.max(0, strain - dt * 0.4)
       }
@@ -866,7 +897,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       shake = Math.max(0, shake - dt)
       warmEl.style.opacity = String(warm)
       card.card.style.transform = shake > 0 ? `translate(${(Math.random() - 0.5) * 14 * shake}px, ${(Math.random() - 0.5) * 10 * shake}px)` : ''
-      focusFill.style.width = `${Math.round(shown * 100)}%`
+      if (focusFill) focusFill.style.width = `${Math.round(shown * 100)}%`
       if (strainFill) {
         strainFill.style.width = `${Math.round(clamp01(strain) * 100)}%`
         strainFill.style.background = strain > 0.8 ? '#ff7a8a' : strain > 0.6 ? '#ffd08a' : '#9fd0ff'

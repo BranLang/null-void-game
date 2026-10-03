@@ -197,7 +197,7 @@ W(
   'third_coming',
   l('Tretí Príchod', 'The Third Coming'),
   l(
-    `Okolo roku 712 druhého veku pristane z neba loď plná Makov, železných ľudí, poslov Matky. Pristanú v Kitsune a začne sa *Vek Poslov*.\n\nV tom istom roku sa Kitsune utopí v hrôze. Lekcia Krvi zničí mesto a iskra je odvtedy zakázaná.\n\nPotom príde *Éra Objavov*. Maki prinesú stroje, kovoobrábanie a inžinierstvo. Varietas sa naučia stavať vzducholode, parné motory a mechanické zbrane a nad mrakmi vzniknú obchodné trasy.\n\nPred ním boli dva. Pri Prvom Príchode zostúpili z hviezd Matkine deti. Pri Druhom vyšli z temnôt Ex Inferis.`,
+    `Okolo roku 712 druhého veku pristane z neba loď plná Makov, železných ľudí, poslov Matky. Pristanú v Kitsune a začne sa *Vek Poslov*.\n\nV tom istom roku sa Kitsune utopí v hrôze. Lekcia Krvi zničí mesto a iskra je odvtedy zakázaná.\n\nPotom príde *Éra Objavov*. Maki prinesú stroje, kovoobrábanie a inžinierstvo. Varietas sa naučia stavať vzducholode, parné motory a mechanické zbrane a nad mrakmi vzniknú obchodné trasy.\n\nPredchádzali mu dva ďalšie. Pri Prvom Príchode zostúpili z hviezd Matkine deti, pri Druhom vyšli z temnôt Ex Inferis.`,
     `Around the year 712 of the Second Age, a ship full of Maki — iron people, messengers of the Mother — lands from the sky. They come down in Kitsune, and the *Age of Messengers* begins.\n\nIn the same year Kitsune drowns in horror. The Lesson of Blood destroys the city, and the spark has been forbidden ever since.\n\nThen comes the *Era of Discovery*. The Maki bring machines, metalworking and engineering. The Varietas learn to build airships, steam engines and mechanical weapons, and trade routes open above the clouds.\n\nTwo Comings came before it. At the First, the Mother's children descended from the stars. At the Second, the Ex Inferis emerged from the darkness.`,
   ),
 )
@@ -247,7 +247,7 @@ W(
   'prizraky',
   l('Prízraky', 'Phantoms'),
   l(
-    `Bytosti utkané z prachu. Niektoré majú tvar, niektoré sú len chlad a prítomnosť. Všetky sú nebezpečné.\n\nPrvé sa zrodili z chorého prachu v Ére Temnoty. V roku Tretieho Príchodu zničila ich blesková vlna Kitsune; odvtedy sa mesto pred nimi skrýva za stenami Metaru, ktoré ich neprepustia.\n\nBytosť schopná prízraky ovládať a vyháňať nesie titul *exorcista*. Ľud jej hovorí *gōstar* — nie z urážky, zo strachu.`,
+    `Bytosti utkané z prachu. Niektoré majú tvar, niektoré sú len chlad a prítomnosť. Všetky sú nebezpečné.\n\nPrvé sa zrodili z chorého prachu v Ére Temnoty. V roku Tretieho Príchodu ich blesková vlna zničila Kitsune; odvtedy sa mesto pred nimi skrýva za stenami Metaru, ktoré ich neprepustia.\n\nBytosť schopná prízraky ovládať a vyháňať nesie titul *exorcista*. Ľud jej hovorí *gōstar* — nie z urážky, zo strachu.`,
     `Beings woven of dust. Some have a shape; some are only cold and presence. All of them are dangerous.\n\nThe first were born from sick dust in the Era of Darkness. In the year of the Third Coming a lightning wave of them destroyed Kitsune; since then the city has hidden from them behind the walls of Metaru, which will not let them through.\n\nOne who can command and banish phantoms bears the title of *exorcist*. Common folk call such a one a *gōstar* — not as an insult, but out of fear.`,
   ),
 )

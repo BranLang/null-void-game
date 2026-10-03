@@ -1783,7 +1783,8 @@ function runFlow(params: MinigameParams, ctx: MinigameContext): Promise<Minigame
     }
 
     // ------------------------------------------------------------------ loop
-    ctx.loop((dt, time) => {
+    ctx.loop((rawDt, time) => {
+      const dt = Math.max(0, rawDt)
       fit()
       elapsed += dt
       if (!skipVisible && ctx.assist.skipAllowed && elapsed > 150 && !solved) {

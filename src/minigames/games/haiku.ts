@@ -368,6 +368,7 @@ function runHaiku(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
     style.textContent = CSS
     ctx.root.appendChild(style)
     const card = createCard(ctx, def.name, S.sub)
+    card.card.style.width = 'min(880px, 94vw)'
     card.card.style.setProperty('--hk-color', color)
     card.card.style.setProperty('--hk-glow', rgba(color, 0.42))
     card.hint.textContent = ctx.t(S.hint)
