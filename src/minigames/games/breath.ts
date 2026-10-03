@@ -13,7 +13,7 @@
  *                     the NEXT breath (target + 1); pressing early is a miss.
  * }
  * result: { success: hitRatio >= 0.7 (and the twist answered), score: hitRatio,
- *           data: { hits, perfect, beats, twist?: boolean } }
+ *           data: { hits, perfect, beats, accuracy (perfect = 1, good = 0.75), twist?: true } }
  */
 import { registerMinigame, createCard, button, hiDpiCanvas, UI_STRINGS, type MinigameContext } from '../Minigame'
 import type { MinigameParams, MinigameResult } from '../../game/GameAPI'
@@ -244,7 +244,8 @@ function runBreath(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
       const hits = counted.filter((j) => j === 'perfect' || j === 'good').length
       const perfect = counted.filter((j) => j === 'perfect').length
       const ratio = hits / beats
-      const score = Math.round(((perfect + (hits - perfect) * 0.75) / beats) * 100) / 100
+      const score = Math.round(ratio * 100) / 100
+      const accuracy = Math.round(((perfect + (hits - perfect) * 0.75) / beats) * 100) / 100
       const ok = ratio >= 0.7 && (!twist || twistResult === 'hit')
       card.buttons.replaceChildren()
       if (ok) {
@@ -254,7 +255,7 @@ function runBreath(params: MinigameParams, ctx: MinigameContext): Promise<Miniga
         card.buttons.appendChild(
           button(
             ctx.t(UI_STRINGS.continue),
-            () => finish({ success: true, score, data: { hits, perfect, beats, ...(twist ? { twist: true } : {}) } }),
+            () => finish({ success: true, score, data: { hits, perfect, beats, accuracy, ...(twist ? { twist: true } : {}) } }),
             true,
           ),
         )

@@ -422,7 +422,7 @@ export class CodexScreen {
     const paras = Array.from(body.querySelectorAll('p'))
     // a first paragraph that is only an *italic* line is a tagline (caste · species · place)
     const first = paras[0]
-    if (first && first.childNodes.length === 1 && first.firstChild instanceof HTMLElement && first.firstChild.tagName === 'EM') first.classList.add('nvm-tagline')
+    if (first && entry.category !== 'book' && paras.length > 1 && first.childNodes.length === 1 && first.firstChild instanceof HTMLElement && first.firstChild.tagName === 'EM') first.classList.add('nvm-tagline')
     // drop cap on the first plain paragraph that is long enough to wrap around it
     const firstPlain = paras.find((p) => p.firstChild?.nodeType === Node.TEXT_NODE)
     if (firstPlain && this.tab !== 'glossary' && (firstPlain.textContent ?? '').length > 150) firstPlain.classList.add('nvm-dropcap')

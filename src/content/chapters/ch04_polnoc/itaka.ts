@@ -6,6 +6,7 @@
  * smitten; three days; the last night in the dock tavern.
  */
 import type { SceneDef } from '../../types'
+import type { GameAPI } from '../../../game/GameAPI'
 import { l } from '../../../i18n/i18n'
 import { dockFog, dockDusk } from './nyau/ambience'
 import { dockMap, dockProps, dockSpawns } from './nyau/maps'
@@ -78,7 +79,9 @@ export const itakaScene: SceneDef = {
           g.emote('old', '…')
           await g.narrate(l('Dokár pokrčil plecami a odišiel.', 'The dockhand shrugged and walked away.'))
           g.set('c4.askedMaker')
-          void g.walk('old', [17, 14])
+          await g.walk('old', [17, 14])
+          await g.wait(800)
+          await threeDays(g)
           return
         }
         await lines(g, [
@@ -166,11 +169,11 @@ export const itakaScene: SceneDef = {
     { id: 'vet2', character: 'c4_vet2', at: [24, 8], facing: 270, hidden: true },
     { id: 'vet3', character: 'c4_vet3', at: [29, 8], facing: 0, hidden: true },
     // the dock tavern (last night)
-    { id: 'pilot1', character: 'c4_pilot1', at: [2, 23], facing: 90, pose: 'sit', hidden: true },
-    { id: 'pilot2', character: 'c4_pilot2', at: [9, 23], facing: 270, pose: 'sit', hidden: true },
-    { id: 'cards1', character: 'c4_cards1', at: [6, 25], facing: 90, pose: 'sit', hidden: true },
-    { id: 'cards2', character: 'c4_cards2', at: [8, 24], facing: 225, pose: 'sit', hidden: true },
-    { id: 'barkeep', character: 'c4_barkeep', at: [1, 23], facing: 90, hidden: true },
+    { id: 'pilot1', character: 'c4_pilot1', at: [2, 23], facing: 45, pose: 'sit', hidden: true },
+    { id: 'pilot2', character: 'c4_pilot2', at: [9, 23], facing: 225, pose: 'sit', hidden: true },
+    { id: 'cards1', character: 'c4_cards1', at: [6, 25], facing: 45, pose: 'sit', hidden: true },
+    { id: 'cards2', character: 'c4_cards2', at: [8, 24], facing: 270, pose: 'sit', hidden: true },
+    { id: 'barkeep', character: 'c4_barkeep', at: [1, 23], facing: 45, hidden: true },
   ],
   interactables: [
     {
@@ -180,6 +183,7 @@ export const itakaScene: SceneDef = {
       verb: 'take',
       when: (g) => g.flag('c4.stage') === 'load' && !g.flag('c4.carry'),
       run: async (g) => {
+        g.hint(null)
         g.pose('player', 'carry')
         g.sfx('whoosh', 0.3)
         g.set('c4.carry')
@@ -253,8 +257,8 @@ export const itakaScene: SceneDef = {
         await g.read(
           l('Dosky nad stolmi pilotov', "Boards above the pilots' tables"),
           l(
-            'Kriedou, rôznymi rukami, mená strojov a ich kapitánov. Niektoré prečiarknuté.\n\n*Ranná čajka* · Beladiss — Nyau\n*Siedma vlna* · Nevriss\n*Korteg* · nákladná · západné aerodoky\n~~Biela soľ~~ · stratená v Tai\n\nNa samom spodku, nikým neprepísané, len jedno slovo: *Itaka*.',
-            'In chalk, in many hands, the names of ships and their captains. Some struck through.\n\n*Morning Gull* · Beladiss — Nyau\n*Seventh Wave* · Nevriss\n*Korteg* · freighter · the western aerodocks\n~~White Salt~~ · lost in Tai\n\nAt the very bottom, never written over by anyone, a single word: *Itaka*.',
+            'Kriedou, rôznymi rukami, mená strojov a ich kapitánov. Niektoré prečiarknuté.\n\n*Ranná čajka* · Beladiss — Nyau\n*Siedma vlna* · Nevriss\n*Kortegova nákladná* · západné aerodoky\n*Biela soľ* · prečiarknuté, a pod tým: stratená v Tai\n\nNa samom spodku, nikým neprepísané, len jedno slovo: *Itaka*.',
+            'In chalk, in many hands, the names of ships and their captains. Some struck through.\n\n*Morning Gull* · Beladiss — Nyau\n*Seventh Wave* · Nevriss\n*Korteg’s freighter* · the western aerodocks\n*White Salt* · struck through, and beneath it: lost in Tai\n\nAt the very bottom, never written over by anyone, a single word: *Itaka*.',
           ),
           { style: 'letter' },
         )
@@ -310,9 +314,10 @@ export const itakaScene: SceneDef = {
     if (evening) {
       await g.atmosphere(dockDusk, 0)
       for (const id of ['pilot1', 'pilot2', 'cards1', 'cards2', 'barkeep']) g.show(id, true)
-      g.teleport('flint', [3, 25], 90)
+      g.teleport('flint', [3, 25], 45)
       g.pose('flint', 'sit')
       g.show('mech', false)
+      g.show('saburo', false)
     }
     if (g.flag('c4.stage') === 'chase') {
       g.set('c4.stage', 'stop')
@@ -332,13 +337,10 @@ export const itakaScene: SceneDef = {
     })
     if (g.flag('c4.stage') === 'stop') await threeDays(g)
   },
-  onUpdate: (g) => {
-    if (g.flag('c4.stage') === 'load' && g.time > 6) g.hint(null)
-  },
 }
 
 /** Flint calls; the Itaka glides in out of the fog and lands. */
-async function arrival(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Promise<void> {
+async function arrival(g: GameAPI): Promise<void> {
   g.cinematic(true)
   g.objective(null)
   g.hint(null)
@@ -353,6 +355,7 @@ async function arrival(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Prom
   await g.focus([27, -2], { ms: 1800, zoom: 0.72 })
   g.particles({ kind: 'steam', count: 46, area: [24, -4, 30, 7], color: '#eef2f6', id: 'itaka_steam' })
   g.propVisible('itaka_glide', true)
+  const glideStart = g.time
   void g.atmosphere({ fog: { color: '#cdd0d6', near: 6, far: 40 } }, 9000)
   await g.narrate(l('Vzducholoď prišla od západu, odtiaľ, kde nad diaľkovou vodou ležala hmla, hustá a nehybná, aká sadá na kanály pred úsvitom. Z tej sivej sa čosi odlepilo.', 'The airship came from the west, from where the fog lay over the distant water, thick and motionless, the kind that settles on the canals before dawn. Something peeled itself away from that grey.'))
   await g.narrate(l('Prichádzalo bez praskotu olejových motorov a bez vlečky čierneho dymu, akými sa obchodné vzducholode ohlasovali zďaleka. Nepraskalo. Nedymilo. Kĺzalo, a vzduch ho niesol zadarmo.', 'It came without the crackle of oil engines and without the trail of black smoke by which merchant airships announced themselves from afar. It did not crackle. It did not smoke. It glided, and the air carried it for free.'))
@@ -374,7 +377,9 @@ async function arrival(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Prom
     ['player', l('Videl si ju niekedy?', 'Ever seen her before?')],
     ['flint', l('Nie. Ale Hask hovoril. Bol v Beladiss, keď pristála pred troma zimami. Hovoril, že celý aerodok vyšiel von.', 'No. But Hask talked about her. He was in Beladiss when she landed three winters ago. Said the whole aerodock came out to look.')],
   ])
-  // the landing
+  // the landing (wait for the glide to settle)
+  const left = 11.2 - (g.time - glideStart)
+  if (left > 0) await g.wait(left * 1000)
   g.set('c4.arrived')
   await g.focus([25, 7], { ms: 1200, zoom: 1.05 })
   await g.narrate(l('Itaka pristála s presnosťou, ktorá pre toto vzletisko nebola typická. Jemne a dokonale, bez jediného trhnutia.', 'The Itaka landed with a precision this airfield was not used to. Gently and perfectly, without a single jolt.'))
@@ -426,14 +431,10 @@ async function arrival(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Prom
   g.set('c4.stage', 'look')
   g.objective(l('Opýtaj sa starého dokára, čo Itaka priniesla.', 'Ask the old dockhand what the Itaka brought.'))
   g.checkpoint()
-  // after looking around: three days
-  await g.until(() => !!g.flag('c4.askedMaker'))
-  await g.wait(1200)
-  await threeDays(g)
 }
 
 /** Three days pass; on the second afternoon Flint makes for the Itaka. */
-async function threeDays(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Promise<void> {
+async function threeDays(g: GameAPI): Promise<void> {
   g.lock()
   g.cinematic(true)
   await g.fade('black', 900)
@@ -453,7 +454,7 @@ async function threeDays(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Pr
   void g.walk('flint', [24, 9], { speed: 2.2 })
 }
 
-async function stopFlint(g: Parameters<NonNullable<SceneDef['onEnter']>>[0], caught: boolean): Promise<void> {
+async function stopFlint(g: GameAPI, caught: boolean): Promise<void> {
   g.hint(null)
   g.objective(null)
   g.cinematic(true)
@@ -486,15 +487,16 @@ async function stopFlint(g: Parameters<NonNullable<SceneDef['onEnter']>>[0], cau
 }
 
 /** The last night before the Itaka leaves, in the dock tavern. */
-async function tavern(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Promise<void> {
+async function tavern(g: GameAPI): Promise<void> {
   await g.fade('black', 1000)
   g.set('c4.evening')
   g.show('vet1', false)
   g.show('mech', false)
+  g.show('saburo', false)
   for (const id of ['pilot1', 'pilot2', 'cards1', 'cards2', 'barkeep']) g.show(id, true)
-  g.teleport('player', [5, 25], 270)
+  g.teleport('player', [5, 25], 225)
   g.pose('player', 'sit')
-  g.teleport('flint', [3, 25], 90)
+  g.teleport('flint', [3, 25], 45)
   g.pose('flint', 'sit')
   await g.atmosphere(dockDusk, 0)
   g.music(null)
@@ -517,7 +519,10 @@ async function tavern(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Promi
   await g.say('flint', l('Je z Nyau. Ja nie som.', "She's from Nyau. I'm not."), { mood: 'closed' })
   await g.narrate(l('Flintove dievčatá sa striedali s prílivmi a mená si nepamätal. Ale túto Flint spomenul za posledný mesiac tretí raz. A ten zelený črep vídal v jeho rukách priveľa večerov na to, aby mu veril.', 'Flint’s girls came and went with the tides and he never remembered their names. But this one he had mentioned three times in the past month. And Arkot had seen that green shard in his hands too many evenings to believe him.'))
   // the cards
-  void g.walk('flint', [7, 24]).then(() => g.pose('flint', 'sit'))
+  void g.walk('flint', [7, 24]).then(() => {
+    g.face('flint', [7, 25])
+    g.pose('flint', 'sit')
+  })
   await g.narrate(l('Pri vedľajšom stole rozdávali karty a Flint to zacítil skôr, než sa otočil, ako pes dym. Za dve rozdania bol v hre. Za tri sa smial nahlas a mince pred ním rástli a rednúli v tom istom starom rytme.', 'At the next table they were dealing cards, and Flint smelled it before he turned round, like a dog smells smoke. Within two hands he was in the game. Within three he was laughing out loud, and the coins in front of him grew and thinned in the same old rhythm.'))
   g.sfx('tick', 0.5)
   await g.wait(600)
@@ -539,7 +544,7 @@ async function tavern(g: Parameters<NonNullable<SceneDef['onEnter']>>[0]): Promi
   await g.narrate(l('V Diss pili rybári priamo z fliaš, sediac na mokrých skalách s nohami vo vode. Otec pil najviac. More si ho vzalo v búrke a nevrátilo ani telo. Ani kôš.', 'In Diss the fishermen drank straight from the bottle, sitting on wet rocks with their feet in the water. His father drank the most. The sea took him in a storm and gave back neither body nor basket.'))
   await g.narrate(l('Každému, kto sa pýtal, hovoril, že z Beladiss odišiel, lebo tam nemal prečo zostať. Znelo to ako gravitácia; keď zmizne všetko, čo ťa drží, nohy ťa odnesú tam, kde je teplejšie, vrecia ťažšie a nikto sa nepýta, odkiaľ si.', "To anyone who asked he said he had left Beladiss because there was nothing to stay for. It sounded like gravity: when everything that holds you is gone, your feet carry you where it is warmer, the sacks are heavier and nobody asks where you are from."))
   g.pose('player', 'stand')
-  g.teleport('player', [5, 24], 90)
+  g.teleport('player', [5, 24], 45)
   await lines(g, [
     ['flint', l('Kam ideš?', 'Where are you going?')],
     ['player', l('Mám veci.', 'I have things to do.')],

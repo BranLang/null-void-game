@@ -7,7 +7,7 @@
  *
  * Story stage lives in the flag `c16.stage` (see index.ts for the overview).
  */
-import type { ActorDef, PlacedProp, SceneDef } from '../../types'
+import type { ActorDef, PlacedProp, SceneDef, Vec2 } from '../../types'
 import type { GameAPI } from '../../../game/GameAPI'
 import { l } from '../../../i18n/i18n'
 import { HALL_DAWN, HALL_EVENING, HALL_HEAVY, HALL_LIGHT, HALL_MAP } from './shared'
@@ -748,14 +748,15 @@ async function waterRunsOut(g: GameAPI): Promise<void> {
   await g.narrate(l('Toru vedľa neho, rovnaká generácia, rovnaké jazvy, už stál.', 'Toru beside him, the same generation, the same scars, was already standing.'))
   await g.focus('saburo', { ms: 1000 })
   await g.narrate(l('Saburo sa na nich pozrel dlho, palica medzi kolenami. Prikývol.', 'Saburo looked at them for a long time, the cane between his knees. He nodded.'))
-  for (const [i, at] of [
-    [0, [3, 11]],
-    [1, [4, 11]],
-    [2, [3, 12]],
-  ] as const) {
+  const youngAt: Vec2[] = [
+    [3, 11],
+    [4, 11],
+    [3, 12],
+  ]
+  youngAt.forEach((at, i) => {
     g.show(`young${i}`, true)
     void g.walk(`young${i}`, at)
-  }
+  })
   await g.narrate(l('Traja mladší sa zdvihli mlčky.', 'Three younger ones rose in silence.'))
   g.follow()
   void g.walk('toru', [2, 10])

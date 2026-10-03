@@ -86,7 +86,7 @@ async function eclipse(g: GameAPI): Promise<void> {
   g.music('null_void', 2500)
   await g.focus([6, 1], { ms: 1400, zoom: 1.1 })
   await g.narrate(l('Svetlo v okienku sa zmenilo.', 'The light in the porthole changed.'))
-  void g.eclipse(1, 9000)
+  const closing = g.eclipse(1, 9000)
   void g.atmosphere({ hemi: eclipseAmb.hemi, sun: eclipseAmb.sun, grade: eclipseAmb.grade }, 9000)
   await g.narrate(l('Celý večer v ňom visela Sai, jantárová, s tenkým prstencom, a teraz z jednej strany tmavla. Mrak to nebol. Tmavla zvnútra, jantár prechádzal do hrdzavej a potom do farby, akú má mäso tesne pod kožou.', 'All evening Sai had hung in it, amber, with a thin ring, and now one side of it was darkening. It was no cloud. It darkened from within, the amber turning to rust and then to the colour of flesh just under the skin.'))
   await g.narrate(l('Prstenec zhasínal po kúskoch, ako lampy na nábreží, keď ich niekto obchádza so zhášadlom.', 'The ring went out piece by piece, like the lamps along a quay when someone makes the rounds with a snuffer.'))
@@ -100,6 +100,7 @@ async function eclipse(g: GameAPI): Promise<void> {
   g.bark('boy', l('Matka zatvára Oko. Matka zatvára Oko…', 'The Mother closes the Eye. The Mother closes the Eye…'), 4200)
   await g.narrate(l('Chalan šepkal po nyausky. Potom už len meno El, dookola.', 'The boy whispered in the Nyau tongue. Then only the name of El, over and over.'))
   await g.say('player', l('Od chvíle, keď sa tieň dotkol okraja Sai. Nádych za nádychom, ako na streche v Diss. Tieň má svoju rýchlosť, ako okraj mraku. Kým prejde cez celú Sai, zmeriam ju. A zvyšok sa dá zrátať.', 'Since the moment the shadow touched the rim of Sai. Breath after breath, like on the roof in Diss. The shadow has its speed, like the edge of a cloud. By the time it crosses the whole of Sai I’ll have measured it. And the rest can be counted.'), { thought: true })
+  await closing
   await g.atmosphere({ sky: eclipseAmb.sky }, 0)
   await g.narrate(l('Za okienkom vyšli hviezdy. Husté ako soľ vysypaná na čierne súkno, také, aké pri otvorenom Oku nevyjdú nikdy.', 'Beyond the porthole the stars came out. Thick as salt spilled on black cloth, stars that never show while the Eye is open.'))
   await g.narrate(l('Trvalo to dlho. Dama sa modlila, chalan šepkal, Flint pretáčal mincu medzi prstami a rátanie prešlo do stoviek.', 'It went on for a long time. The woman prayed, the boy whispered, Flint turned a coin between his fingers, and the count passed into the hundreds.'))
@@ -121,7 +122,7 @@ async function standoff(g: GameAPI): Promise<void> {
   await g.say('boy', l('Je tu zábradlie.', 'There’s a railing.'), { mood: 'angry' })
   // the grab
   g.pose('boy', 'stand')
-  g.teleport('boy', [5, 5], 135)
+  await g.walk('boy', [5, 5], { run: true })
   g.face('boy', 'flint')
   g.pose('flint', 'stand')
   g.face('flint', 'boy')
@@ -182,10 +183,11 @@ async function afterward(g: GameAPI): Promise<void> {
   await g.narrate(l('Oko ostalo zavreté. Hviezdy za sklom žiarili ďalej, husté a cudzie, a päsť v golieri sa zovrela pevnejšie. Flint sa neprestal usmievať. Palec mu na pažbe prešiel na kohútik.', 'The Eye stayed closed. Beyond the glass the stars went on blazing, thick and strange, and the fist in the collar clenched tighter. Flint did not stop smiling. His thumb moved from the grip to the hammer.'))
   await g.narrate(l('Arkot sa nadýchol ešte raz.', 'Arkot drew one more breath.'))
   await g.focus([6, 1], { ms: 900, zoom: 1.1 })
-  void g.eclipse(0, 5000)
+  const opening = g.eclipse(0, 5000)
   void g.atmosphere({ hemi: restoredAmb.hemi, sun: restoredAmb.sun, grade: restoredAmb.grade }, 5000)
   g.sfx('chime', 0.6)
   await g.narrate(l('Prstenec sa rozsvietil na okraji. Tenko, ako vlas svetla na hrane tmavého skla, a potom sa jas šíril dookola kúsok po kúsku, tak, ako sa na nábreží zapaľujú lampy, jedna za druhou, až sa kruh zavrel.', 'The ring lit at its edge. Thin, like a hair of light on the rim of dark glass, and then the brightness spread around it piece by piece, the way the lamps along a quay are lit one after another, until the circle closed.'))
+  await opening
   await g.atmosphere({ sky: restoredAmb.sky }, 0)
   await g.narrate(l('Do Sai sa zdola nahor vracal jantár. Hviezdy za okienkom bledli.', 'Amber returned to Sai from the bottom up. The stars beyond the porthole paled.'))
   g.music(null, 3000)

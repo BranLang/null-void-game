@@ -105,7 +105,7 @@ const CSS = `
 .nvhk-top{display:flex;gap:24px;align-items:center;justify-content:center;flex-wrap:wrap}
 .nvhk-page{display:flex;flex-direction:column;gap:8px;width:min(480px,86vw)}
 .nvhk-label{font-family:var(--nv-font-title);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--nv-text-dim);opacity:.8;padding-left:4px}
-.nvhk-slot{position:relative;min-height:56px;border:1px dashed rgba(214,178,106,.42);border-radius:9px;
+.nvhk-slot{position:relative;box-sizing:border-box;min-height:54px;border:1px dashed rgba(214,178,106,.42);border-radius:9px;
   background:linear-gradient(180deg,rgba(44,35,24,.55),rgba(18,14,10,.62));display:flex;align-items:center;gap:12px;
   padding:7px 14px;cursor:pointer;transition:border-color .2s,box-shadow .25s,background .25s;touch-action:none;user-select:none}
 .nvhk-slot.target{border-color:rgba(243,217,149,.75)}
@@ -139,6 +139,7 @@ const CSS = `
 .nvhk-status{font-family:var(--nv-font-title);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--nv-text-dim);display:flex;gap:7px;align-items:center}
 .nvhk-pip{width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,90,106,.55);box-sizing:border-box}
 .nvhk-pip.on{background:var(--nv-danger);box-shadow:0 0 8px rgba(255,90,106,.6)}
+@media (max-height:680px){.nvhk-slot{min-height:44px;padding:4px 12px}.nvhk-text{font-size:19px}.nvhk-rem{font-size:18px}.nvhk-tile{font-size:17px;padding:5px 14px 4px}.nvhk-pool{gap:8px;min-height:50px}.nvhk-page{gap:6px}}
 @keyframes nvhk-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 `
 
@@ -369,6 +370,8 @@ function runHaiku(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
     ctx.root.appendChild(style)
     const card = createCard(ctx, def.name, S.sub)
     card.card.style.width = 'min(880px, 94vw)'
+    card.card.style.boxSizing = 'border-box'
+    card.card.style.overflowY = 'auto'
     card.card.style.setProperty('--hk-color', color)
     card.card.style.setProperty('--hk-glow', rgba(color, 0.42))
     card.hint.textContent = ctx.t(S.hint)
@@ -384,7 +387,7 @@ function runHaiku(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
 
     const { canvas, ctx: g } = hiDpiCanvas(CW, CH)
     const fitCanvas = () => {
-      const s = Math.max(0.62, Math.min(1, (window.innerHeight - 520) / CH, (window.innerWidth - 80) / CW))
+      const s = Math.max(0.6, Math.min(1, (window.innerHeight - 450) / CH, (window.innerWidth - 80) / CW))
       canvas.style.width = `${Math.round(CW * s)}px`
       canvas.style.height = `${Math.round(CH * s)}px`
     }

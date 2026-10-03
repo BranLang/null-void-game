@@ -537,6 +537,8 @@ function runClock(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
 
     const card = createCard(ctx, S.title, S.sub)
     card.card.style.width = 'min(880px, 94vw)'
+    card.card.style.boxSizing = 'border-box'
+    card.card.style.overflowY = 'auto'
     card.hint.textContent = ctx.t(S.hint)
     card.buttons.style.minHeight = '42px'
     const { canvas, ctx: g } = hiDpiCanvas(W, H)

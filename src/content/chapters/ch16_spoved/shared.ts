@@ -61,6 +61,11 @@ const people: Record<string, CastMember> = {
     look: fox({ build: 'small', face: 'child', hair: { style: 'wild', color: '#c86a2a' }, outfit: { type: 'tunic', primary: '#6a7a5a', pants: '#3a3a2e' } }),
   },
 }
+people.c16_voice = {
+  name: l('Ženský hlas', 'A woman’s voice'),
+  color: '#e6d8ff',
+  look: { species: 'human', skin: '#f2e2d6', outfit: { type: 'dress', primary: '#f4f2fa' } },
+}
 for (let i = 0; i < 3; i++) {
   people[`c16_young${i}`] = {
     name: l('Mladý lišiak', 'A young fox'),
@@ -384,5 +389,25 @@ export function story(g: GameAPI): {
     felix: g.relation('felix'),
     saburo: g.relation('saburo'),
     goji: g.relation('goji'),
+  }
+}
+
+/**
+ * Phantoms feel the warmth of a living body that is not hidden under the veil.
+ * Call every frame; returns true when the creature has turned towards her.
+ */
+export function makeSense(radius = 2.4, limit = 1.3): { reset(): void; update(g: GameAPI, ids: string[], dt: number): boolean; level(): number } {
+  let meter = 0
+  return {
+    reset() {
+      meter = 0
+    },
+    level: () => meter / limit,
+    update(g, ids, dt) {
+      let near = false
+      if (!g.veiled()) for (const id of ids) if (g.dist(id, 'player') < radius) near = true
+      meter = near ? meter + dt : Math.max(0, meter - dt * 0.6)
+      return meter >= limit
+    },
   }
 }

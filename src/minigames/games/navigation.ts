@@ -688,6 +688,9 @@ const CSS = `
 .nvnav-waits .nv-btn{flex:1;text-align:center;padding:6px 4px;font-size:11px;white-space:nowrap}
 .nvnav-log{font-size:13px;font-style:italic;color:var(--nv-text-dim);line-height:1.28;height:52px;overflow:hidden}
 .nvnav-log div:first-child{color:var(--nv-text)}
+.nvnav-side.compact .nvnav-log,.nvnav-side.compact .nvnav-saisub{display:none}
+.nvnav-side.compact{gap:6px}
+.nvnav-side.compact .nvnav-leg{min-height:96px}
 .nvnav-ev{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(10,6,3,.42);backdrop-filter:blur(1.5px)}
 .nvnav-evc{width:min(380px,86%);padding:16px 18px;display:flex;flex-direction:column;gap:10px;animation:nv-fade-in .3s}
 .nvnav-evc .nvnav-evt{font-family:var(--nv-font-title);color:var(--nv-gold);letter-spacing:.1em;text-transform:uppercase;font-size:15px;text-align:center}
@@ -949,7 +952,9 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
     style.textContent = CSS
     ctx.root.appendChild(style)
     const card = createCard(ctx, def.title, def.sub)
-    card.card.style.width = 'min(920px, 96vw)'
+    card.card.style.width = 'min(944px, 98vw)'
+    card.card.style.boxSizing = 'border-box'
+    card.card.style.overflowY = 'auto'
     card.hint.textContent = ctx.t(S.hint)
     card.buttons.style.minHeight = '42px'
 
@@ -975,7 +980,7 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
     saiBox.appendChild(saiCanvas)
     const saiLab = el('div', 'nvnav-lab', ctx.t(S.sai))
     saiLab.title = ctx.t(S.cycle, { p: P, h: HV })
-    const saiSub = el('div', '', ctx.t(S.cycle, { p: P, h: HV }))
+    const saiSub = el('div', 'nvnav-saisub', ctx.t(S.cycle, { p: P, h: HV }))
     saiSub.style.cssText = 'font-size:11.5px;color:var(--nv-text-dim);font-style:italic;line-height:1'
     saiBox.append(saiLab, saiSub)
     side.appendChild(saiBox)
@@ -1008,11 +1013,14 @@ function runNavigation(params: MinigameParams, ctx: MinigameContext): Promise<Mi
     side.appendChild(logBox)
 
     const fit = () => {
-      const availW = window.innerWidth * 0.96 - 60
-      const wide = availW >= MW + 240
-      const s = Math.max(0.42, Math.min(1, (wide ? availW - 240 : availW) / MW, (window.innerHeight * 0.92 - (wide ? 230 : 560)) / MH))
+      const availW = window.innerWidth * 0.96 - 56
+      const availH = window.innerHeight * 0.92 - 200
+      const besides = availW - 240 >= 330
+      const s = Math.max(0.42, Math.min(1, (besides ? availW - 240 : availW) / MW, (besides ? availH : availH - 420) / MH))
       canvas.style.width = `${Math.round(MW * s)}px`
       canvas.style.height = `${Math.round(MH * s)}px`
+      // short screens: slimmer side panel (no log, smaller clock labels)
+      side.classList.toggle('compact', besides && MH * s < 430)
     }
     fit()
     window.addEventListener('resize', fit)
