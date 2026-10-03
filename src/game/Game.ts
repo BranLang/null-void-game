@@ -28,7 +28,7 @@ import { SaveLoadMenu } from '../ui/menus/SaveLoadMenu'
 import { CodexScreen } from '../ui/menus/CodexScreen'
 import { CreditsScreen } from '../ui/menus/CreditsScreen'
 import { ChapterSelect } from '../ui/menus/ChapterSelect'
-import { loadTexture } from '../engine/plate/PlateLayer'
+import { loadPlateTexture } from '../engine/plate/PlateLayer'
 import { preloadSprites } from '../engine/characters/SpriteCharacter'
 import { SPRITES } from '../content/sprites'
 import { openReader, anyLayerOpen, syncRootSettings } from '../ui/menus/Reader'
@@ -368,12 +368,12 @@ export class Game implements MenuHost {
     if (def.plate) {
       const sprites = new Set<string>()
       for (const c of [def.player.character, ...(def.actors ?? []).map((a) => a.character)]) if (SPRITES[c]) sprites.add(SPRITES[c])
-      const [tex] = await Promise.all([loadTexture(def.plate.src).catch(() => undefined), preloadSprites([...sprites])])
+      const [tex] = await Promise.all([loadPlateTexture(def.plate).catch(() => undefined), preloadSprites([...sprites])])
       plateTex = tex
     }
     const world = new World(def, this.renderer, this.rig, plateTex)
     this.world = world
-    this.rig.setViewHeight(def.camera?.viewHeight ?? (world.plate ? 99 : 12.5))
+    this.rig.setViewHeight(def.camera?.viewHeight ?? (world.plate ? 9 : 12.5))
     if (world.plate) {
       const f = world.plate.frame
       this.rig.setPlate(new THREE.Vector3(f.cx, 0, f.cz), f.W, f.H)

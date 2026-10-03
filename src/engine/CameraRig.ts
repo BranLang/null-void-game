@@ -73,7 +73,7 @@ export class CameraRig {
     const aspect = window.innerWidth / Math.max(1, window.innerHeight)
     let h = this.viewHeight / this.zoom
     if (this.plate) {
-      const cover = Math.min(this.plate.h, this.plate.w / aspect)
+      const cover = Math.min(this.plate.h, this.plate.w / aspect, this.viewHeight)
       h = Math.min(cover / this.zoom, cover)
     }
     this.camera.left = (-h * aspect) / 2

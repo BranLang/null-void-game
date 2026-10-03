@@ -52,6 +52,28 @@ const garden: SceneDef = {
   ],
 }
 
+/** Stitching test: four unrelated paintings as one 2x2 map (only shows scale and scrolling). */
+const TILES = {
+  src: '',
+  tiles: [
+    ['assets/ref/nyau_garden_empty.png', 'assets/ref/nyau_street_empty.png'],
+    ['assets/ref/nyau_canal_empty.png', 'assets/ref/nyau_temple_empty.png'],
+  ],
+  aspect: 1,
+  width: 32,
+  tint: '#d6d2f0',
+  walk: [[[0.02, 0.02], [0.98, 0.02], [0.98, 0.98], [0.02, 0.98]] as [number, number][]],
+}
+const tiles: SceneDef = {
+  ...garden,
+  id: 'show_tiles',
+  plate: TILES,
+  map: plateMap(TILES),
+  player: { character: 'yera', at: plateAt(TILES)(0.5, 0.5) },
+  actors: [],
+  interactables: [],
+}
+
 const chapter: ChapterDef = {
   id: 'showcase',
   index: 999,
@@ -59,7 +81,7 @@ const chapter: ChapterDef = {
   title: l('Ukážka', 'Showcase'),
   subtitle: l('Maľované scény', 'Painted scenes'),
   pov: 'yera',
-  scenes: [garden],
+  scenes: [garden, tiles],
   start: 'show_garden',
 }
 

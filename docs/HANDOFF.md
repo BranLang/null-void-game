@@ -19,6 +19,13 @@ The game is a single-player anime **narrative adventure** based on the novel *Nu
 - **Chapters ch01–ch16:** partially written by agents that were stopped mid-work. Expect missing scenes or chapters (ch02, ch03, ch09, ch17, ch18 and the ending may be absent), unfinished scripts and untested flow. Check them against `docs/STORY_PLAN.md`.
 - **Minigames:** in `src/minigames/games/`. Set B (cipher, clock, crystal, haiku, navigation) has been tested; set A was last reported type-clean.
 
+## Map size (owner feedback: one 1024 px painting is too small for a game map)
+- Maps are **tiled plates**: `plate.tiles = [[row0...], [row1...]]`. The tiles are stitched at load time into one texture (max 8192 px).
+- Generate each map in Flow as a grid of tiles with continuous edges (outpaint each tile from its neighbour). Each map should be 2×2 to 4×4 tiles of 2048 px.
+- Scale: `plate.width` is in world units. The camera shows 9 world units vertically (`camera.viewHeight`), and a character is 1.45 units tall on screen. So `width` ≈ 16 per 1024 px of painting at the painted scale of the old Nyau images; a 2×2 map is `width: 32`.
+- Stitching test: `?scene=show_tiles` (four unrelated old paintings, just to check scale and scrolling).
+- The Yera and Tami sprites and the Nyau paintings are the owner's own art from the old repo (`null-void-rpg`, branch `game`).
+
 ## Next steps, in order
 1. **Art:** a local session with Claude in Chrome generates the plates, sprites, portraits and CGs in Google Flow, following `docs/ART_BRIEF.md`, and commits them under `public/assets/`.
    - For new sprites, add a pack function to `scripts/pack_sprites.py` that keys out the #00FF00 green background, then add the character to `src/content/sprites.ts`.

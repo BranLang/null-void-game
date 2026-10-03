@@ -30,6 +30,36 @@ export function loadTexture(url: string): Promise<THREE.Texture> {
   return p
 }
 
+function loadImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error(`image ${url}`))
+    img.src = url
+  })
+}
+
+/** Load a plate's texture: one image, or a grid of tiles stitched into one canvas. */
+export async function loadPlateTexture(def: PlateDef): Promise<THREE.Texture> {
+  if (!def.tiles?.length) return loadTexture(def.src)
+  const rows = await Promise.all(def.tiles.map((row) => Promise.all(row.map(loadImage))))
+  const tw = rows[0][0].naturalWidth
+  const th = rows[0][0].naturalHeight
+  const cols = Math.max(...rows.map((r) => r.length))
+  const max = 8192
+  const scale = Math.min(1, max / Math.max(tw * cols, th * rows.length))
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(tw * cols * scale)
+  canvas.height = Math.round(th * rows.length * scale)
+  const ctx = canvas.getContext('2d')!
+  rows.forEach((row, y) => row.forEach((img, x) => ctx.drawImage(img, x * tw * scale, y * th * scale, tw * scale + 1, th * scale + 1)))
+  const tex = new THREE.CanvasTexture(canvas)
+  tex.colorSpace = THREE.SRGBColorSpace
+  tex.anisotropy = 4
+  tex.minFilter = THREE.LinearMipmapLinearFilter
+  return tex
+}
+
 /**
  * The painted backdrop plus occluder cut-outs. The backdrop is a camera-facing
  * quad drawn first without depth. Each occluder is the same painting masked by

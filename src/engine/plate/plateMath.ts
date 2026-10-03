@@ -24,6 +24,13 @@ export interface PlateOccluder {
 export interface PlateDef {
   /** image url relative to the page, e.g. 'assets/ref/nyau_garden_empty.png' */
   src: string
+  /**
+   * Large maps: a grid of painted tiles (rows of urls, same tile size, edges continuing
+   * into each other, e.g. Flow outpainting). They are stitched at load time into one
+   * texture (max 8192 px on the long side) and `src` is ignored. `aspect` is the aspect
+   * of the whole stitched map.
+   */
+  tiles?: string[][]
   /** image height / width */
   aspect: number
   /** world units the image spans horizontally (larger = characters look smaller) */
