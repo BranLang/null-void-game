@@ -33,6 +33,8 @@ npm install
 npm run dev          # http://localhost:5175
 npm run build        # static build in dist/ (upload to itch.io / any web host)
 npm run preview
+npm run desktop      # build and run the desktop app (Electron)
+npm run desktop:build  # Windows portable .exe + Linux AppImage in release/
 ```
 
 Development helpers:

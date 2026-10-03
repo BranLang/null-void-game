@@ -308,7 +308,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
       for (let i = 0; i < count; i++) {
         const t = r()
         const side = Math.floor(r() * 4)
-        const len = md * (0.05 + r() * 0.11)
+        const len = md * (0.07 + r() * 0.2)
         const jit = (r() - 0.5) * 0.9
         if (side === 0) fern(t * edgeW, -2, Math.PI / 2 + jit, len, 1.4, 0, 2)
         else if (side === 1) fern(t * edgeW, edgeH + 2, -Math.PI / 2 + jit, len, 1.4, 0, 2)
@@ -804,7 +804,7 @@ function runFocus(params: MinigameParams, ctx: MinigameContext): Promise<Minigam
         [0.85, 1.2, 0.6],
         [0, 0.85, 0.45],
       ] as const) {
-        eg.strokeStyle = `rgba(232,246,255,${a * (0.45 + s * 0.55)})`
+        eg.strokeStyle = `rgba(232,246,255,${a * (0.3 + s * 0.7)})`
         eg.lineWidth = lo > 1 ? 1.4 : lo > 0.5 ? 1 : 0.7
         eg.beginPath()
         for (let i = 0; i < edgeSegs.length; i += 6) {
