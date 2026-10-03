@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prop Gallery (dev)</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0a10; color: #eee; font: 12px ui-monospace, Menlo, Consolas, monospace; }
+      #app { position: fixed; inset: 0; }
+      #labels { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+      .lbl { position: absolute; transform: translate(-50%, 2px); white-space: nowrap; color: #f4efe2; font-size: 11px; line-height: 1.15; text-align: center; text-shadow: 0 1px 2px #000, 0 0 3px #000; }
+      .lbl small { display: block; color: #9fc4ff; font-size: 10px; }
+      #hud { position: fixed; left: 8px; top: 8px; padding: 6px 9px; border-radius: 4px; background: rgba(8, 8, 14, 0.62); color: #d8d4e8; pointer-events: none; }
+      #hud b { color: #fff; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="labels"></div>
+    <div id="hud"></div>
+    <script type="module" src="/src/dev/gallery.ts"></script>
+  </body>
+</html>
