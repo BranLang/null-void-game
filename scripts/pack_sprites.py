@@ -132,6 +132,25 @@ def main(src):
         },
     )
 
+    se = os.path.join(src, 'serastrip')
+    if os.path.isdir(se):
+        pack(
+            'sera',
+            [
+                ('idle_s', strip(os.path.join(se, 'sera-idle.png'), 341)),
+                ('walk_s', strip(os.path.join(se, 'sera-walk-down.png'), 341)),
+                ('walk_e', strip(os.path.join(se, 'sera-walk-right.png'), 341)),
+                ('walk_se', strip(os.path.join(se, 'sera-walk-down-right.png'), 341)),
+                ('walk_ne', strip(os.path.join(se, 'sera-walk-up-right.png'), 341)),
+                ('walk_n', strip(os.path.join(se, 'sera-walk-up.png'), 341)),
+            ],
+            {'idle': 3, 'walk': 8},
+            extra={
+                'idle_e': {'from': 'walk_e', 'pick': [0], 'fps': 1},
+                'idle_n': {'from': 'walk_n', 'pick': [0], 'fps': 1},
+            },
+        )
+
     dirs = ['s', 'se', 'e', 'ne', 'n', 'nw', 'w', 'sw']
     pack(
         'samael',

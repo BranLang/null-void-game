@@ -9,4 +9,6 @@ export const SPRITES: Record<string, string> = {
   yera_festival: 'yera',
   tami: 'tami',
   samael: 'samael',
+  // the guard Nira uses the old repo's Sera sheet (dark-clad warrior)
+  nira: 'sera',
 }

@@ -6,7 +6,7 @@
  */
 import type { AmbienceDef, ChapterDef, ExitDef, SceneDef, Vec2 } from '../../types'
 import { l } from '../../../i18n/i18n'
-import { NYAU_GARDEN, NYAU_STREET, NYAU_VILLA } from '../../plates/nyau'
+import { NYAU_GARDEN, NYAU_STREET, NYAU_TEMPLE, NYAU_VILLA } from '../../plates/nyau'
 import { plateAt, plateMap } from '../../../engine/plate/plateMath'
 
 const night: AmbienceDef = {
@@ -39,7 +39,7 @@ const garden: SceneDef = {
   actors: [{ id: 'soril', character: 'soril', at: g1(0.25, 0.7), facing: 30 }],
   exits: [
     {
-      ...exitAt(g1(0.05, 0.92), 'demo_street', l('Domov', 'Home'), 2),
+      ...exitAt(g1(0.05, 0.92), 'demo_temple', l('Pred chrám', 'To the temple forecourt'), 2),
       when: (g) => !!g.flag('demo.healed'),
       blocked: l('Soril sa na ňu stále pozerá. Strom čaká.', 'Soril is still watching her. The tree is waiting.'),
     },
@@ -127,6 +127,51 @@ const garden: SceneDef = {
     })
     if (g.flag('demo.healed')) g.plateRegion('branch', 0)
     else g.plateRegion('branch', 0.78)
+  },
+}
+
+// ------------------------------------------------------------------------ temple
+const t1 = plateAt(NYAU_TEMPLE)
+const temple: SceneDef = {
+  id: 'demo_temple',
+  name: l('Predchrámie, Nyau', 'The Temple Forecourt, Nyau'),
+  plate: NYAU_TEMPLE,
+  map: plateMap(NYAU_TEMPLE),
+  ambience: { ...night, music: 'temple', particles: [{ kind: 'motes', count: 40, color: '#e9c8ff' }] },
+  player: { character: 'yera_temple', at: t1(0.08, 0.76), facing: 330 },
+  exits: [exitAt(t1(0.84, 0.9), 'demo_street', l('Dolu do mesta', 'Down into the city'), 1)],
+  interactables: [
+    {
+      id: 'book',
+      at: t1(0.76, 0.5),
+      label: l('Kniha El', 'The Book of El'),
+      verb: 'read',
+      radius: 2.4,
+      run: async (g) => {
+        await g.narrate(l('Skrz otvorené dvere hľadela do chrámu: svietiace mozaiky, dym kadidla, a v strede oltára na podstavci Kniha El. Stará, ručne šitá, s doskami z bieleho dreva a stránkami, ktoré v tme jemne žiarili.', 'Through the open doors she looked into the temple: glowing mosaics, incense smoke, and at the centre of the altar, on its pedestal, the Book of El. Old, hand-sewn, with covers of white wood and pages that glowed softly in the dark.'))
+        await g.read(
+          l('Kniha El', 'The Book of El'),
+          l('„Blahoslavená je dcéra, ktorá svieti pre svoj ľud. Beda dcére, ktorá svieti len pre seba.“ (2:16)\n\n„A tí, čo prišli, zabudli odkiaľ. A tí, čo zostali, nikdy nevedeli kam.“ (3:7)', '“Blessed is the daughter who shines for her people. Woe to the daughter who shines only for herself.” (2:16)\n\n“And those who came forgot where from. And those who stayed never knew where to.” (3:7)'),
+          { style: 'book' },
+        )
+        await g.narrate(l('Yera ju prečítala stokrát. Zakaždým však v tých slovách čosi chýbalo. Vzduch medzi riadkami, na ktorý sa nedalo ukázať prstom.', 'Yera had read it a hundred times. Yet every time, something was missing from those words. Air between the lines that no finger could point to.'))
+      },
+    },
+    {
+      id: 'brazier',
+      at: t1(0.46, 0.62),
+      label: l('Kadidelnica', 'The brazier'),
+      verb: 'look',
+      run: async (g) => {
+        await g.narrate(l('Ťažké a sladké kadidlo tlmilo pachy z mesta pod nimi, najmä vôňu gleja a surového dreva. Na poschodí pod chrámom celé noci skladali kostry budúcich lampiónov.', 'Heavy, sweet incense muffled the smells of the city below, glue and raw wood above all. On the floor beneath the temple they had spent whole nights building the frames of the coming lanterns.'))
+      },
+    },
+  ],
+  onEnter: async (g) => {
+    g.objective(l('Zísť po schodoch do mesta', 'Take the stairs down into the city'))
+    await g.once('demo.temple', async () => {
+      await g.narrate(l('Poďakovala sa kňažke úklonom hlavy a otočila sa na odchod.', 'She thanked the priestess with a bow of her head and turned to leave.'))
+    })
   },
 }
 
@@ -256,7 +301,7 @@ const chapter: ChapterDef = {
   title: l('Ukážka · Kapitola 1', 'Demo · Chapter 1'),
   subtitle: l('Prvé svetlo', 'First Light'),
   pov: 'yera',
-  scenes: [garden, street, villa],
+  scenes: [garden, temple, street, villa],
   start: 'demo_garden',
 }
 
